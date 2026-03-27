@@ -1,1 +1,11 @@
-["Feature", "In concept", "Client request", "Bug", "Assigned", "Urgent", "Shelved"]
+[
+    "Backend",
+    "Frontend",
+    "Design",
+    "UI",
+    "UX",
+    "Animation",
+    "Database",
+    "Feature",
+    "Logic"
+]
