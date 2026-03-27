@@ -1,7 +1,7 @@
 <script setup>
 	import TaskCard from './TaskCard.vue';
-	defineProps(["column"]);
-	defineEmits(["delete-task"]);
+	defineProps(["column", "allColumns"]);
+	defineEmits(["delete-task", "move-task"]);
 </script>
 
 <template>
@@ -13,7 +13,11 @@
 				</span>
 		</h4>
 		<div class="column-body">
-			<TaskCard v-for="task in column.tasks" :key="task.id" :task="task" @delete-task="$emit('delete-task', $event)"/>
+			<TaskCard
+				v-for="task in column.tasks" :key="task.id"
+				:task="task" :allColumns="allColumns" :currentColumnId="column.id"
+				@delete-task="$emit('delete-task', $event)" @move-task="$emit('move-task', $event)"
+			/>
 		</div>
 		<div v-if="column.tasks.length === 0" class="text-center">
 			<p class="text-muted small m-0">No task here yet.</p>

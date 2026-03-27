@@ -41,7 +41,17 @@
 
     async function handleDeleteTask(taskId) {
         await fetch(`/api/tasks/${taskId}`, {
-                method: 'DELETE'
+            method: 'DELETE'
+        });
+
+        await loadColumns();
+    }
+
+    async function moveTaskHandler({taskId, newColumnId}) {
+        await fetch(`/api/move-task/${taskId}`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ newColumnId })
         });
 
         await loadColumns();
@@ -65,7 +75,7 @@
     </div>
 	<div v-else>
 		<Header :title="title" @open="isOpen = !isOpen"/>
-		<Board :columns="columns" @delete-task="handleDeleteTask"/>
+		<Board :columns="columns" @delete-task="handleDeleteTask" @move-task="moveTaskHandler"/>
 		<Modal 
 			v-if="isOpen"
 			:isOpen="isOpen" 

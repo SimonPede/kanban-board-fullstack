@@ -1,14 +1,24 @@
 <script setup>
-	import { ref } from 'vue';
+	import { computed, ref } from 'vue';
 	import Tag from './Tag.vue'
 	import { Trash2 } from 'lucide-vue-next';
 
-	defineProps(["task"]);
-	defineEmits(["delete-task"]);
+	const props = defineProps(["task", "allColumns", "currentColumnId"]);
+	const emit = defineEmits(["delete-task", "move-task"]);
 	const isCollapsed = ref(true);
+
+	const otherColumns = computed(() => {
+        if (!props.allColumns) return [];
+        return props.allColumns.filter(col => col.id !== props.currentColumnId);
+    });
 
 	function toggleCollapsed() {
 		isCollapsed.value = !isCollapsed.value;
+	}
+
+	function handleMove(event) {
+		const newColumnId = parseInt(event.target.value);
+        emit("move-task", { taskId: props.task.id, newColumnId });
 	}
 </script>
 
@@ -23,7 +33,7 @@
 				class="btn btn-link text-danger p-0 m-0 d-flex align-items-center delete-btn"
 				@click.stop="$emit('delete-task', task.id)"
 			>
-				<Trash2 :size="18" />
+				<Trash2 :size="18"/>
 			</button>
 		</div>
 
@@ -33,6 +43,17 @@
 
 		<div class="card-footer">
 			<Tag v-for="tag in task.tags" :tagText="tag" />
+			<select
+				class="form-select form-select-sm w-auto border-0 text-muted"
+				@change="handleMove"
+				:value="currentColumnId"
+			>
+				<option :value="currentColumnId" disabled>Move</option>
+
+				<option v-for="col in otherColumns" :value="col.id" :key="col.id">
+					Move to: {{ col.name }}
+				</option>
+			</select>
 		</div>
 	</div>
 </template>
