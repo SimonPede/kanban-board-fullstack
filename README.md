@@ -18,16 +18,18 @@ Ein interaktives Kanban-Board, entwickelt im Rahmen des Studiums **Medieninforma
 1. **Repository klonen:**
    ```bash
    git clone [https://github.com/SimonPede/kanban-board-fullstack.git](https://github.com/SimonPede/kanban-board-fullstack.git)
-Frontend bauen:
+   
+2. **Frontend bauen:**
+   ```bash
+   cd frontend
+   npm install
+   npm run build
+   Backend starten:
 
-Bash
-cd frontend
-npm install
-npm run build
-Backend starten:
+3. **Backend starten**
+   ```bash
+   cd ../backend
+   npm install
+   node index.js
 
-Bash
-cd ../backend
-npm install
-node index.js
 Öffne http://localhost:3000 im Browser.
