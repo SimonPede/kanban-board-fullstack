@@ -20,6 +20,11 @@ export default defineConfig({
         target: 'http://localhost:3000', // ...werden an das Backend weitergereicht
         changeOrigin: true,
       }
-    }
+    },
+    server: {
+      watch: {
+        usePolling: true, // Zwingt Vite, nach Änderungen zu suchen
+    },
+  },
   }
 })

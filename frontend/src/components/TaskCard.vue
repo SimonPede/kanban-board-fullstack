@@ -14,10 +14,10 @@
 	<div class="card bg-light mt-3">
         <h5 class="card-header collapsed">{{ task.title }}</h5>
 
-
         <div :class="['card-body', {'collapsed': isCollapsed}]" @click="toggleCollapsed">
 			{{ task.text }}
 		</div>
+		
 		<div class="card-footer">
 			<Tag v-for="tag in task.tags" :tagText="tag" />
 		</div>
