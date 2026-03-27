@@ -39,6 +39,14 @@
         isOpen.value = false;
     }
 
+    async function handleDeleteTask(taskId) {
+        await fetch(`/api/tasks/${taskId}`, {
+                method: 'DELETE'
+        });
+
+        await loadColumns();
+    }
+
     onMounted(async () => {
         try {
             await Promise.all([loadColumns(), loadTags()]);
@@ -57,7 +65,7 @@
     </div>
 	<div v-else>
 		<Header :title="title" @open="isOpen = !isOpen"/>
-		<Board :columns="columns"/>
+		<Board :columns="columns" @delete-task="handleDeleteTask"/>
 		<Modal 
 			v-if="isOpen"
 			:isOpen="isOpen" 
