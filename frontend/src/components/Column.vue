@@ -19,8 +19,9 @@
 				@delete-task="$emit('delete-task', $event)" @move-task="$emit('move-task', $event)"
 			/>
 		</div>
-		<div v-if="column.tasks.length === 0" class="text-center">
+		<div v-if="column.tasks.length === 0" class="text-center py-5 border rounded border-secondary border-dashed" style="border-style: dashed !important; border-width: 1px;">
 			<p class="text-muted small m-0">No task here yet.</p>
+			<i class="bi bi-box-seam text-muted" style="font-size: 1.5rem;"></i>
 		</div>
 	</div>
 </template>

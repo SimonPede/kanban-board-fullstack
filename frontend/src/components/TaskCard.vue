@@ -41,19 +41,27 @@
 			{{ task.text }}
 		</div>
 
-		<div class="card-footer">
-			<Tag v-for="tag in task.tags" :tagText="tag" />
-			<select
-				class="form-select form-select-sm w-auto border-0 text-muted"
-				@change="handleMove"
-				:value="currentColumnId"
-			>
-				<option :value="currentColumnId" disabled>Move</option>
-
-				<option v-for="col in otherColumns" :value="col.id" :key="col.id">
-					Move to: {{ col.name }}
-				</option>
-			</select>
+		<div class="card-footer bg-transparent border-0 pt-0">
+			<div class="d-flex flex-wrap gap-1 mb-2">
+				<Tag v-for="tag in task.tags" :key="tag" :tagText="tag" />
+			</div>
+			<div class="mt-2 pt-2 border-top border-secondary-subtle d-flex justify-content-lg-start gap-2 align-items-center">
+				<label 
+					class="form-label text-muted small m-0 mb-1 d-block" 
+					style="font-size: 0.7rem; font-weight: 600; letter-spacing: 0.05em; text-transform: uppercase;"
+				>
+					Move to status
+				</label>
+				<select
+					class="form-select form-select-sm w-auto border-0 text-muted transition-all action-dropdown"
+					@change="handleMove"
+					:value="currentColumnId"
+				>
+					<option v-for="col in otherColumns" :value="col.id" :key="col.id">
+						→ {{ col.name }}
+					</option>
+				</select>
+			</div>
 		</div>
 	</div>
 </template>
@@ -74,10 +82,10 @@
         transform: translateY(-2px);
     }
 
-	/* Der Button ist standardmäßig fast unsichtbar und wird beim Hover deutlich */
+	/* Der Button ist standardmäßig fast unsichtbar*/
     .delete-btn {
         opacity: 0.4;
-        transition: opacity 0.2s;
+        transition: opacity 0.2s ease-in-out;
 		transition: transform 0.2s;
     }
 
@@ -88,4 +96,27 @@
     .task-card:hover .delete-btn {
         opacity: 1.0;
     }
+
+	.action-dropdown {
+		opacity: 0.4; /* Standardmäßig dezent */
+		transition: all 0.2s ease-in-out;
+		border-radius: 6px;
+		padding-left: 0.5rem;
+		padding-right: 1.5rem; /* Platz für den Pfeil */
+		font-size: 0.75rem;
+		background-color: #f1f3f5;
+		cursor: pointer;
+	}
+
+	/* den Fokus-Rahmen von Bootstrap weg und nutzen unser eigenes Styling */
+	.action-dropdown:focus {
+		box-shadow: none;
+		border: 1px solid #ced4da !important;
+	}
+
+	/* Beim Hover über die Karte wird das Dropdown präsent */
+	.task-card:hover .action-dropdown {
+		opacity: 1;
+		background-color: #e9ecef;
+	}
 </style>
