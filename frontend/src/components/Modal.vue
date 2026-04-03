@@ -45,13 +45,97 @@
     }
 
     function handleCancel() {
-        resetNewTask(); // Beim Abbrechen leeren
+        resetNewTask();
         emit('close');
     }
 
 </script>
 
 <template>
+
+    <div :id="MODAL_ID" class="fixed inset-0 z-50 flex items-center justify-center p-4">
+        <div class="absolute inset-0 bg-slate-900/60 backdrop-blur-sm" @click="handleCancel"></div> <!--Hintergund -->
+        
+        <div class="relative w-full max-w-lg bg-white rounded-2xl shadow-2xl overflow-hidden border border-slate-200">
+            <div class="px-6 py-4 border-b border-slate-100 flex items-center justify-between bg-slate-50/50">
+                <div class="flex items-center gap-3">
+                    <h5 class="text-lg font-bold text-slate-800">Create Task in</h5>
+                    <select v-model="newTask.columnId" class="bg-white border border-slate-300 text-slate-700 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 p-1.5 outline-none">
+                        <option v-for="col in columns" :key="col.id" :value="col.id">
+                            {{ col.name }}
+                        </option>
+                    </select>
+                </div>
+                <button @click="handleCancel" class="text-slate-400 hover:text-slate-600 transition-colors">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
+                </button>
+            </div>
+            <div class="p-6 space-y-5">
+                <div>
+                    <label class="block mb-1.5 text-sm font-semibold text-slate-700">Task Title</label>
+                    <input type="text" v-model="newTask.title" maxlength="50" 
+                        placeholder="What needs to be done?"
+                        class="w-full px-4 py-2 bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none transition-all">
+                    <p class="mt-1.5 text-xs text-right text-slate-400">
+                        {{ newTask.title.length }}/50 characters
+                    </p>
+                </div>
+
+                <div>
+                    <label class="block mb-1.5 text-sm font-semibold text-slate-700">Description</label>
+                    <textarea v-model="newTask.text" rows="3"
+                            class="w-full px-4 py-2 bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none transition-all"></textarea>
+                </div>
+                <div class="mt-4">
+                    <label class="block mb-2 text-sm font-semibold text-slate-700">Tags</label>
+                    <div class="grid grid-cols-2 sm:grid-cols-3 gap-3 p-3 bg-slate-50 rounded-xl border border-slate-100">
+                        <div v-for="tagName in tags" :key="tagName" class="flex">
+                            <label :for="MODAL_CHECKBOX_BASE_ID + tagName"
+                                class="flex items-center w-full p-2 rounded-lg cursor-pointer select-none hover:bg-white hover:shadow-sm transition-all group"
+                            >    
+                                <input
+                                    type="checkbox" 
+                                    :value="tagName"
+                                    :id="MODAL_CHECKBOX_BASE_ID + tagName"
+                                    v-model="newTask.tags"
+                                    class="shrink-0 w-4 h-4 mb-0 rounded border-slate-300 text-blue-600 focus:ring-blue-500 cursor-pointer translate-y-40px self-center"
+                                    style="margin: 0 !important; 
+                                            position: relative !important; 
+                                            top: 0px; 
+                                            display: inline-block !important;
+                                            vertical-align: middle !important;"
+                                >
+
+                                <div class="w-2 inline-block"></div>
+
+                                <Tag :tagText="tagName" class="ml-3" />
+                            </label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="px-6 py-4 bg-slate-50/80 flex justify-end gap-3">
+                <button @click="handleCancel" 
+                        class="px-5 py-2 text-sm font-medium text-slate-600 hover:text-slate-800 transition-colors">
+                    Cancel
+                </button>
+                
+                <button @click="handleSubmit" 
+                        class="px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-bold rounded-xl shadow-lg shadow-blue-500/30 transition-all active:scale-95">
+                    Create Task
+                </button>
+            </div>
+        </div>
+    </div>
+</template>
+
+<style scoped>
+</style>
+
+
+
+
+<!-- <template>
     <!-- Modal-Container: Wird nur angezeigt, wenn isOpen true ist -->
     <!-- 
         Bootstrap-Klassen:
@@ -60,9 +144,9 @@
         - "tabindex=-1": Verbessert die Zugänglichkeit, indem es verhindert, dass das Modal ungewollt fokussiert wird
         - style="display: block": Überschreibt das Standardverhalten von Bootstrap (normalerweise display: none) und zeigt das Modal an
     -->
-    <div :id="MODAL_ID" class="modal show" tabindex="-1" style="display: block">
+    <!-- <div :id="MODAL_ID" class="modal show" tabindex="-1" style="display: block">
         <!-- TODO: implement -->
-        <div class="modal-dialog">
+        <!-- <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header d-flex align-items-center">
                     <h5 class="modal-title me-3">Create Task in</h5>
@@ -118,7 +202,4 @@
             </div>
         </div>
     </div>
-</template>
-
-<style scoped>
-</style>
+</template> -->

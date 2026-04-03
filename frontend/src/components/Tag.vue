@@ -1,5 +1,5 @@
 <template>
-    <span class="badge me-2" :class="colorClass">
+    <span class="badge" :class="colorClass">
         {{ tagText }}
     </span>
 </template>
