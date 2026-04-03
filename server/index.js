@@ -8,13 +8,17 @@ const fs = require('fs');
 //hier eine in-memory Kopie
 const tags = require('./data/tags.json');
 const columns = require('./data/columns.json');
+const counterData = require('./data/counter.json');
 
-let allTasks = [];
-columns.forEach(col => {
-    allTasks = allTasks.concat(col.tasks);
-});
+// let allTasks = [];
+// columns.forEach(col => {
+//     allTasks = allTasks.concat(col.tasks);
+// });
+// let taskIdCounter = (allTasks.length > 0 ? Math.max(...allTasks.map(e => parseInt(e.id.replace("t", "")))): 0) + 1;
 
-let taskIdCounter = (allTasks.length > 0 ? Math.max(...allTasks.map(e => parseInt(e.id.replace("t", "")))): 0) + 1;
+//die Counter-Berechnung funktioniert zwar, aber wenn ein Element in der Mitte der Liste gelöscht wird (z.B.: haben t1,t2,t3 und löschen t3, geht es kaputt)
+let taskIdCounter = counterData.taskIdCounter;
+
 ///////////////////////////
 // Server setup
 ///////////////////////////
@@ -37,6 +41,9 @@ function saveData() {
     //Die '2' am Ende sorgt für Einrückungen (2 Leerzeichen)
     const dataString = JSON.stringify(columns, null, 2);
     fs.writeFileSync(filePath, dataString);
+
+    counterData.taskIdCounter = taskIdCounter;
+    fs.writeFileSync("./data/counter.json", JSON.stringify(counterData, null, 2));
 }
 
 ///////////////////////////
