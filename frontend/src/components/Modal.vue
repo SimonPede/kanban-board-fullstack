@@ -18,7 +18,7 @@
     const newTask = ref({
         title: '',
         text: '',
-        columnId: null,
+        columnId: "todo",
         tags: []
     });
 
@@ -34,7 +34,7 @@
         newTask.value = {
             title: '',
             text: '',
-            columnId: props.columns[0]?.id || null,
+            columnId: props.columns[0]?.id || "todo",
             tags: []
         }
     }
@@ -52,7 +52,6 @@
 </script>
 
 <template>
-
     <div :id="MODAL_ID" class="fixed inset-0 z-50 flex items-center justify-center p-4">
         <div class="absolute inset-0 bg-slate-900/60 backdrop-blur-sm" @click="handleCancel"></div> <!--Hintergund -->
         

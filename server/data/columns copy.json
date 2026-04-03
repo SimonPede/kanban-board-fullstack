@@ -7,19 +7,28 @@
         "id": "t1",
         "title": "Modal Design-Upgrade",
         "text": "Das Modal optisch aufwerten. Entscheidung treffen: Bootstrap anpassen oder auf Tailwind CSS umsteigen für volle Flexibilität.",
-        "tags": ["Design", "UI"]
+        "tags": [
+          "Design",
+          "UI"
+        ]
       },
       {
         "id": "t2",
         "title": "Animationen implementieren",
         "text": "Lösch-Animation (Fade-out) und Verschiebungs-Animation (Smooth Transition) einbauen, damit das Board flüssiger wirkt.",
-        "tags": ["UX", "Animation"]
+        "tags": [
+          "UX",
+          "Animation"
+        ]
       },
       {
         "id": "t3",
         "title": "MongoDB Atlas Integration",
         "text": "Echte Datenbank anbinden, damit die Tasks beim Server-Neustart nicht verloren gehen.",
-        "tags": ["Backend", "Database"]
+        "tags": [
+          "Backend",
+          "Database"
+        ]
       }
     ]
   },
@@ -31,7 +40,10 @@
         "id": "t4",
         "title": "Create-Task Button Finalisierung",
         "text": "Das Design des Buttons im Header abschließen (Hover-Effekte, Icons und Responsive Verhalten prüfen).",
-        "tags": ["Frontend", "Design"]
+        "tags": [
+          "Frontend",
+          "Design"
+        ]
       }
     ]
   },
@@ -43,7 +55,10 @@
         "id": "t5",
         "title": "Status-Wechsel Feature",
         "text": "Dropdown-Logik in der TaskCard und API-Endpoint zum Verschieben erfolgreich implementiert.",
-        "tags": ["Feature", "Logic"]
+        "tags": [
+          "Feature",
+          "Logic"
+        ]
       }
     ]
   }

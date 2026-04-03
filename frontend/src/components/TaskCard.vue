@@ -17,7 +17,7 @@
 	}
 
 	function handleMove(event) {
-		const newColumnId = parseInt(event.target.value);
+		const newColumnId = event.target.value;
         emit("move-task", { taskId: props.task.id, newColumnId });
 	}
 </script>
