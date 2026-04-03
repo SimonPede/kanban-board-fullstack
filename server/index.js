@@ -46,6 +46,27 @@ function saveData() {
     fs.writeFileSync("./data/counter.json", JSON.stringify(counterData, null, 2));
 }
 
+function validateTask(task) {
+    const errors = [];
+
+    if (!task.title || typeof task.title !== 'string' || task.title.trim().length === 0) {
+        errors.push("Titel ist erforderlich und darf nicht leer sein.");
+    } else if (task.title.length > 50) {
+        errors.push("Titel darf maximal 50 Zeichen lang sein.");
+    }
+
+    const validColumnsIds = columns.map(c => c.id);
+    if (!validColumnsIds.includes(task.column)) {
+        errors.push("Ungültige Spalten-ID.");
+    }
+
+    if (task.taskTags && !Array.isArray(task.taskTags)) {
+        errors.push("Tags müssen als Liste (Array) gesendet werden.");
+    }
+
+    return errors;
+}
+
 ///////////////////////////
 // CRUD operations
 ///////////////////////////
@@ -63,6 +84,16 @@ app.get("/api/columns", (req, res) => {
 });
 
 app.post("/api/tasks", (req, res) => {
+    console.log("BACKEND EMPFÄNGT:", req.body);
+    const errors = validateTask(req.body);
+
+    if (errors.length > 0) {
+        return res.status(400).json({ 
+            error: "Validierung fehlgeschlagen", 
+            details: errors 
+        });
+    }
+
     let {column, title, text, taskTags} = req.body;
 
     let newId = "t" + taskIdCounter;

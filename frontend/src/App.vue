@@ -23,7 +23,7 @@
     }
 
     async function handleNewTask(taskData) {
-        await fetch('/api/tasks', {
+        const response = await fetch('/api/tasks', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
@@ -33,6 +33,14 @@
                 taskTags: taskData.tags
             })
         });
+
+        if (!response.ok) {
+            const errorData = await response.json();
+            console.error("SERVER FEHLER DETAILS:", errorData.details);
+            
+            alert("Fehler: " + errorData.details.join("\n")); 
+            return;
+        }
 
         await loadColumns();
         

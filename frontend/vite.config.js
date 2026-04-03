@@ -21,10 +21,8 @@ export default defineConfig({
         changeOrigin: true,
       }
     },
-    server: {
-      watch: {
-        usePolling: true, // Zwingt Vite, nach Änderungen zu suchen
-    },
+    watch: { // Direkt in server, nicht nochmal ein server-key
+      usePolling: true,
   },
   }
 })
