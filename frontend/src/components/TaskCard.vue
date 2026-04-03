@@ -55,7 +55,7 @@
 				<select
 					class="form-select form-select-sm w-auto border-0 text-muted transition-all action-dropdown"
 					@change="handleMove"
-					:value="currentColumnId"
+					:value="currentColumnId" 
 				>
 					<option v-for="col in otherColumns" :value="col.id" :key="col.id">
 						→ {{ col.name }}
@@ -108,7 +108,7 @@
 		cursor: pointer;
 	}
 
-	/* den Fokus-Rahmen von Bootstrap weg und nutzen unser eigenes Styling */
+	/* den Fokus-Rahmen von Bootstrap weg und eigenes Styling */
 	.action-dropdown:focus {
 		box-shadow: none;
 		border: 1px solid #ced4da !important;

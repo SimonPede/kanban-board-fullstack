@@ -1,6 +1,6 @@
 const express = require('express');
 const path = require('path');
-
+const fs = require('fs');
 ///////////////////////////
 // Data initialization
 ///////////////////////////
@@ -14,7 +14,7 @@ columns.forEach(col => {
     allTasks = allTasks.concat(col.tasks);
 });
 
-let taskIdCounter = (allTasks.length > 0 ? Math.max(...allTasks.map(e => parseInt(e.id.replace('t', '')))): 0) + 1;
+let taskIdCounter = (allTasks.length > 0 ? Math.max(...allTasks.map(e => parseInt(e.id.replace("t", "")))): 0) + 1;
 ///////////////////////////
 // Server setup
 ///////////////////////////
@@ -23,12 +23,22 @@ const app = express();
 
 app.use(express.json());
 
-//nun wollen wir Backend mit Frontend verknüpfen (damit wir nicht Vite und Express Server haben)
+//nun wollen wir Backend mit Frontend verknüpfen (damit wir nicht Vite und Express Server haben, die nicht kommunizieren)
 //Statische Dateien aus dem dist-Ordner ausliefern
-//__dirname: globale Variable in Node.js. Sie sagt dir immer: "In welchem Ordner auf der Festplatte liegt diese index.js gerade?
+//__dirname: globale Variable in Node.js. sagt immer: "In welchem Ordner auf der Festplatte liegt diese index.js gerade?
 //express.static ist eingebaute Middleware: macht Server zu Dateiverwalter: "Bevor du nach einer API-Route suchst, schau erst mal in diesem Ordner nach. Wenn der User index.html oder style.css verlangt und die Datei dort liegt: Schick sie ihm einfach direkt!""
 //--> Ohne diese Zeile würde  Server zwar die Daten (/api/tasks) liefern, aber man hätte keine Webseite, auf der man diese Daten sehen kann.
 app.use(express.static(path.join(__dirname, '../frontend/dist')));
+
+function saveData() {
+    //Logik: columns-Array aus RAM in JSON umwandeln und dann in data/colums.json schreiben
+    const filePath = path.join(__dirname, 'data', 'columns.json');
+    //Bonus: JSON.stringify kann die Datei auch schön formatieren!
+    //Die '2' am Ende sorgt für Einrückungen (2 Leerzeichen)
+    const dataString = JSON.stringify(columns, null, 2);
+    fs.writeFileSync(filePath, dataString);
+}
+
 ///////////////////////////
 // CRUD operations
 ///////////////////////////
@@ -61,6 +71,7 @@ app.post("/api/tasks", (req, res) => {
     if (targetColumn) {
         targetColumn.tasks.push(newTask);
         taskIdCounter++;
+        saveData();
 
         res.status(201).json({"id": newId});
     }
@@ -86,6 +97,7 @@ app.put("/api/tasks/:id", (req, res) => {
         foundTask.title = title;
         foundTask.text = text;
         foundTask.tags = taskTags;
+        saveData();
         return res.status(200).send("Task aktualisiert");
     }
 
@@ -106,6 +118,7 @@ app.delete("/api/tasks/:id", (req, res) => {
     });
 
     if (deleted) {
+        saveData();
         return res.status(200).send("Task gelöscht");
     }
 
@@ -130,6 +143,7 @@ app.put("/api/move-task/:id", (req, res) => {
 
     if (taskToMove && targetColumn) {
         targetColumn.tasks.push(taskToMove);
+        saveData();
         return res.status(200).send("Task verschoben");
     }
 
