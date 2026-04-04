@@ -2,9 +2,10 @@
 	import { computed, ref } from 'vue';
 	import Tag from './Tag.vue'
 	import { Trash2 } from 'lucide-vue-next';
+	import { useBoardStore } from '../stores/boardStore';
+    const boardStore = useBoardStore();
 
 	const props = defineProps(["task", "allColumns", "currentColumnId"]);
-	const emit = defineEmits(["delete-task", "move-task"]);
 	const isCollapsed = ref(true);
 
 	const otherColumns = computed(() => {
@@ -18,7 +19,7 @@
 
 	function handleMove(event) {
 		const newColumnId = event.target.value;
-        emit("move-task", { taskId: props.task.id, newColumnId });
+		boardStore.moveTaskHandler( { taskId: props.task.id, newColumnId });
 	}
 </script>
 
@@ -31,7 +32,7 @@
 			<button
 				aria-label="Löschen"
 				class="btn btn-link text-danger p-0 m-0 d-flex align-items-center delete-btn"
-				@click.stop="$emit('delete-task', task.id)"
+				@click.stop="boardStore.handleDeleteTask(task.id)"
 			>
 				<Trash2 :size="18"/>
 			</button>

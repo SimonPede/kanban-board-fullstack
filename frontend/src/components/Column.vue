@@ -1,7 +1,6 @@
 <script setup>
 	import TaskCard from './TaskCard.vue';
 	defineProps(["column", "allColumns"]);
-	defineEmits(["delete-task", "move-task"]);
 </script>
 
 <template>
@@ -16,7 +15,6 @@
 			<TaskCard
 				v-for="task in column.tasks" :key="task.id"
 				:task="task" :allColumns="allColumns" :currentColumnId="column.id"
-				@delete-task="$emit('delete-task', $event)" @move-task="$emit('move-task', $event)"
 			/>
 		</div>
 		<div v-if="column.tasks.length === 0" class="text-center py-5 border rounded border-secondary border-dashed" style="border-style: dashed !important; border-width: 1px;">

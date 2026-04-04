@@ -1,21 +1,20 @@
 <script setup>
+    import { useBoardStore } from '../stores/boardStore';
+    const boardStore = useBoardStore();
     const BUTTON_TOGGLE_MODAL_ID = 'buttonToggleModal';
-
-    defineProps(["title"]);
-    defineEmits(["open"]);  
 </script>
 
 <template>
     <header class="bg-dark text-light d-flex align-items-center justify-content-between p-3 shadow-sm">
         <div class="d-flex align-items-center">
             <img src="../assets/logo.svg" alt="Logo" class="img-fluid me-2" width="28">
-            <h5 class="m-0 fw-bold">{{ title }}</h5>
+            <h5 class="m-0 fw-bold">My Kanban Board</h5>
         </div>
         
         <button 
             :id="BUTTON_TOGGLE_MODAL_ID" 
             class="btn btn-outline-info btn-sm px-3 fw-bold shadow-sm" 
-            @click="$emit('open')"
+            @click="boardStore.isOpen = true"
         >
             <i class="bi bi-plus-lg me-1"></i> + Create Task
         </button>
