@@ -1,0 +1,132 @@
+const columnsBase = require('./data/columns.json');
+const Task = require('./models/Task.js');
+const tags = require('./data/tags.json');
+
+function validateTask(task) {
+    const errors = [];
+
+    if (!task.title || typeof task.title !== "string" || task.title.trim().length === 0) {
+        errors.push("Titel ist erforderlich und darf nicht leer sein.");
+    } else if (task.title.length > 50) {
+        errors.push("Titel darf maximal 50 Zeichen lang sein.");
+    }
+
+    const validColumnsIds = columnsBase.map(c => c.id);
+    if (!task.column || typeof task.column !== 'string' || !validColumnsIds.includes(task.column)) {
+        errors.push("Ungültige oder fehlende Spalten-ID.");
+    }
+
+    if (task.taskTags && !Array.isArray(task.taskTags)) {
+        errors.push("Tags müssen als Liste (Array) gesendet werden.");
+    }
+
+    return errors;
+}
+
+///////////////////////////
+// CRUD operations
+///////////////////////////
+
+// --- ROUTEN ---
+exports.getTags = async (req, res) => {
+    res.status(200).json(tags);
+};
+
+exports.getTasks = async (req, res) => {
+    try {
+        const allTasks = await Task.find(); //alle tasks werden aus der Cloud geholt
+        // console.log(allTasks);
+
+        const columnsWithTasks = columnsBase.map(col => {
+            return {
+                ...col,
+                tasks: allTasks.filter(e => String(e.columnId) === String(col.id))
+            };
+        });
+        res.status(200).json(columnsWithTasks);
+    } catch (error) {
+        console.error("GET ERROR:", error);
+        res.status(500).json({ error: "Fehler beim Laden der Board-Daten" });
+    }
+};
+
+exports.createNewTask = async (req, res) => {
+    const errors = validateTask(req.body);
+    if (errors.length > 0) {
+        return res.status(400).json({ error: "Validierung fehlgeschlagen", details: errors });
+    }
+
+    const { column, title, text, taskTags } = req.body;
+
+    try {
+        const taskDoc = new Task({
+            title,
+            text,
+            columnId: column,
+            tags: taskTags
+        });
+
+        const savedTask = await taskDoc.save();
+        res.status(201).json(savedTask);
+    } catch (error) {
+        console.error("POST ERROR:", error);
+        res.status(500).json({ error: "Datenbankfehler beim Speichern" });
+    }
+};
+
+exports.updateTask = async (req, res) => {
+    const id = req.params.id; //funtkioniert wegen "/api/tasks/:id"
+    let { title, text, taskTags } = req.body;
+
+    try {
+        const updatedTask = await Task.findByIdAndUpdate(
+            id,
+            {
+                title: title,
+                text: text,
+                tags: taskTags
+            },
+            {new: true} //gibt aktualisierte task zurück
+        );
+        if(updatedTask) {
+            return res.status(200).json(updatedTask);
+        }
+        return res.status(404).json({ error: "Task nicht gefunden!" });
+    } catch (error) {
+        console.error("PUT ERROR:", error);
+        res.status(500).json({ error: "Fehler beim Verschieben" });
+    }
+};
+
+exports.deleteTask = async (req, res) => {
+    try {
+        const deletedTask = await Task.findByIdAndDelete(req.params.id);
+        if(deletedTask) {
+            return res.status(200).send("Task gelöscht");
+        }
+        return res.status(404).json({ error: "Task nicht gefunden!" });
+    } catch (error) {
+        console.error("DELETE ERROR:", error);
+        res.status(500).json({ error: "Fehler beim Löschen" });
+    }
+};
+
+exports.moveTask = async (req, res) => {
+    const id = req.params.id;
+    const { newColumnId } = req.body;
+
+    try {
+        const updatedTask = await Task.findByIdAndUpdate(
+            id,
+            { columnId: newColumnId },
+            { new: true } //gibt aktualisierte task zurück
+        );
+        if (updatedTask) {
+            return res.status(200).json(updatedTask);
+        }
+        res.status(404).json({ error: "Task nicht gefunden" });
+    } catch (error) {
+        console.error("MOVE ERROR:", error);
+        res.status(500).json({ error: "Fehler beim Verschieben" });
+    }
+};

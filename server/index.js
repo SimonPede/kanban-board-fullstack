@@ -1,7 +1,7 @@
 const express = require('express');
 const path = require('path');
-const fs = require('fs');
 const mongoose = require('mongoose');
+const taskRoutes = require('./routes/taskRoutes');
 
 require('dotenv').config();
 const mongoURI = process.env.MONGO_URI;
@@ -10,165 +10,22 @@ mongoose.connect(mongoURI)
     .then(() => console.log("Verbindung zu MongoDB Atlas steht!"))
     .catch(err => console.error("MongoDB Verbindungsfehler:", err));
 
-///////////////////////////
-// Data initialization
-///////////////////////////
-
-//hier eine in-memory Kopie
-const tags = require('./data/tags.json');
-const columnsBase = require('./data/columns.json');
-const Task = require('./models/Task.js');
-
-
-///////////////////////////
-// Server setup
-///////////////////////////
-
-const app = express();
-
+//Middleware
 app.use(express.json());
-
-//nun wollen wir Backend mit Frontend verknüpfen (damit wir nicht Vite und Express Server haben, die nicht kommunizieren)
-//Statische Dateien aus dem dist-Ordner ausliefern
-//__dirname: globale Variable in Node.js. sagt immer: "In welchem Ordner auf der Festplatte liegt diese index.js gerade?
-//express.static ist eingebaute Middleware: macht Server zu Dateiverwalter: "Bevor du nach einer API-Route suchst, schau erst mal in diesem Ordner nach. Wenn der User index.html oder style.css verlangt und die Datei dort liegt: Schick sie ihm einfach direkt!""
-//--> Ohne diese Zeile würde  Server zwar die Daten (/api/tasks) liefern, aber man hätte keine Webseite, auf der man diese Daten sehen kann.
 app.use(express.static(path.join(__dirname, "../frontend/dist")));
 
-function validateTask(task) {
-    const errors = [];
+//DB Verbindung
+mongoose.connect(process.env.MONGO_URI)
+    .then(() => console.log("Verbindung zu MongoDB Atlas steht!"))
+    .catch(err => console.error("MongoDB Verbindungsfehler:", err));
 
-    if (!task.title || typeof task.title !== "string" || task.title.trim().length === 0) {
-        errors.push("Titel ist erforderlich und darf nicht leer sein.");
-    } else if (task.title.length > 50) {
-        errors.push("Titel darf maximal 50 Zeichen lang sein.");
-    }
+//--- ROUTEN EINBINDEN ---
+//hier wird definiert: "Alle Anfragen, die mit /api anfangen, übergibst du an taskRoutes"
+app.use('/api', taskRoutes);
 
-    const validColumnsIds = columnsBase.map(c => c.id);
-    if (!task.column || typeof task.column !== 'string' || !validColumnsIds.includes(task.column)) {
-        errors.push("Ungültige oder fehlende Spalten-ID.");
-    }
-
-    if (task.taskTags && !Array.isArray(task.taskTags)) {
-        errors.push("Tags müssen als Liste (Array) gesendet werden.");
-    }
-
-    return errors;
-}
-
-///////////////////////////
-// CRUD operations
-///////////////////////////
-
-app.get("/api/tags", (req, res) => {
-    res.status(200).json(tags);
-});
-
-// --- ROUTEN ---
-
-app.get("/api/columns", async (req, res) => {
-    try {
-        const allTasks = await Task.find(); //alle tasks werden aus der Cloud geholt
-        // console.log(allTasks);
-
-        const columnsWithTasks = columnsBase.map(col => {
-            return {
-                ...col,
-                tasks: allTasks.filter(e => String(e.columnId) === String(col.id))
-            };
-        });
-        res.status(200).json(columnsWithTasks);
-    } catch (error) {
-        console.error("GET ERROR:", error);
-        res.status(500).json({ error: "Fehler beim Laden der Board-Daten" });
-    }
-});
-
-app.post("/api/tasks", async (req, res) => {
-    const errors = validateTask(req.body);
-    if (errors.length > 0) {
-        return res.status(400).json({ error: "Validierung fehlgeschlagen", details: errors });
-    }
-
-    const { column, title, text, taskTags } = req.body;
-
-    try {
-        const taskDoc = new Task({
-            title,
-            text,
-            columnId: column,
-            tags: taskTags
-        });
-
-        const savedTask = await taskDoc.save();
-        res.status(201).json(savedTask);
-    } catch (error) {
-        console.error("POST ERROR:", error);
-        res.status(500).json({ error: "Datenbankfehler beim Speichern" });
-    }
-});
-
-app.put("/api/tasks/:id", async (req, res) => {
-
-    const id = req.params.id; //funtkioniert wegen "/api/tasks/:id"
-    let { title, text, taskTags } = req.body;
-
-    try {
-        const updatedTask = await Task.findByIdAndUpdate(
-            id,
-            {
-                title: title,
-                text: text,
-                tags: taskTags
-            },
-            {new: true} //gibt aktualisierte task zurück
-        );
-        if(updatedTask) {
-            return res.status(200).json(updatedTask);
-        }
-        return res.status(404).json({ error: "Task nicht gefunden!" });
-    } catch (error) {
-        console.error("PUT ERROR:", error);
-        res.status(500).json({ error: "Fehler beim Verschieben" });
-    }
-});
-
-app.delete("/api/tasks/:id", async (req, res) => {
-    try {
-        const deletedTask = await Task.findByIdAndDelete(req.params.id);
-        if(deletedTask) {
-            return res.status(200).send("Task gelöscht");
-        }
-        return res.status(404).json({ error: "Task nicht gefunden!" });
-    } catch (error) {
-        console.error("DELETE ERROR:", error);
-        res.status(500).json({ error: "Fehler beim Löschen" });
-    }
-});
-
-app.put("/api/move-task/:id", async (req, res) => {
-    const id = req.params.id;
-    const { newColumnId } = req.body;
-
-    try {
-        const updatedTask = await Task.findByIdAndUpdate(
-            id,
-            { columnId: newColumnId },
-            { new: true } //gibt aktualisierte task zurück
-        );
-        if (updatedTask) {
-            return res.status(200).json(updatedTask);
-        }
-        res.status(404).json({ error: "Task nicht gefunden" });
-    } catch (error) {
-        console.error("MOVE ERROR:", error);
-        res.status(500).json({ error: "Fehler beim Verschieben" });
-    }
-});
-
-//Server starten
-app.listen(3000, () => {
-    console.log('Kanban-Server läuft auf http://localhost:3000');
+const PORT = 3000;
+app.listen(PORT, () => {
+    console.log(`Kanban-Server läuft auf http://localhost:${PORT}`);
 });
 
 
