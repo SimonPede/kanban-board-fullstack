@@ -21,8 +21,10 @@
         <div class="spinner-border text-primary"></div>
     </div>
 	<div v-else>
-		<Header/>
-		<Board :columns="boardStore.columns"/>
+        <div :class="{ 'content-blur': boardStore.isUpdating}">
+            <Header/>
+            <Board :columns="boardStore.columns"/>
+        </div>
 		<Modal 
 			v-if="boardStore.isOpen"
 			:isOpen="isOpen" 
@@ -33,3 +35,19 @@
 		/>
 	</div>
 </template>
+
+<style scoped>
+
+/* Board wird leicht unscharf, während es lädt */
+.content-blur {
+    filter: blur(2px) grayscale(0.3); /* Kombiniert leichte Unschärfe mit Entfärbung */
+    opacity: 0.6;
+    pointer-events: none; /* Verhindert Klicks auf das Board während des Updates */
+    transition: all 0.3s ease; /* Macht das Ein-/Ausblenden weich */
+}
+
+/* Standard-Zustand für den Content (für weichen Übergang) */
+div {
+    transition: all 0.3s ease;
+}
+</style>

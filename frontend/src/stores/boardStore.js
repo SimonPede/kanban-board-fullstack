@@ -13,6 +13,7 @@ export const useBoardStore = defineStore("boardStore", {
         columns: [],
         tags: [],
         isLoading: false,
+        isUpdating: false,
         isOpen: false
     }),
 
@@ -20,7 +21,10 @@ export const useBoardStore = defineStore("boardStore", {
         async loadColumns(isInitialLoad = false) {
             if (isInitialLoad) {
                 this.isLoading = true;
+            } else {
+                this.isUpdating = true;
             }
+
             try {
                 const response = await fetch('/api/columns');
 
@@ -39,6 +43,7 @@ export const useBoardStore = defineStore("boardStore", {
                 console.error("LOAD COLUMNS ERROR:", err);
             } finally {
                 this.isLoading = false;
+                this.isUpdating = false;
             }
         },
         async loadTags() {
