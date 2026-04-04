@@ -23,6 +23,20 @@ mongoose.connect(process.env.MONGO_URI)
 //hier wird definiert: "Alle Anfragen, die mit /api anfangen, übergibst du an taskRoutes"
 app.use('/api', taskRoutes);
 
+//jetzt globale Error-Middleware für bessere umsetzung von DRY
+app.use((err, req, res, next) => {
+    console.error("GLOBALER FEHLER-LOG:", err.stack);
+
+    const statusCode = err.statusCode || 500; //eigener Status-Code? Ansonsten 500 (allg. Server-Error)
+    const message = err.message || "Interner Serverfehler";
+
+    res.status(statusCode).json({
+        status: "error",
+        statusCode: statusCode,
+        message: message
+    });
+});
+
 const PORT = 3000;
 app.listen(PORT, () => {
     console.log(`Kanban-Server läuft auf http://localhost:${PORT}`);

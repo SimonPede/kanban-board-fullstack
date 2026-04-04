@@ -32,7 +32,7 @@ exports.getTags = async (req, res) => {
     res.status(200).json(tags);
 };
 
-exports.getTasks = async (req, res) => {
+exports.getTasks = async (req, res, next) => {
     try {
         const allTasks = await Task.find(); //alle tasks werden aus der Cloud geholt
         // console.log(allTasks);
@@ -45,12 +45,11 @@ exports.getTasks = async (req, res) => {
         });
         res.status(200).json(columnsWithTasks);
     } catch (error) {
-        console.error("GET ERROR:", error);
-        res.status(500).json({ error: "Fehler beim Laden der Board-Daten" });
+        next(error);
     }
 };
 
-exports.createNewTask = async (req, res) => {
+exports.createNewTask = async (req, res, next) => {
     const errors = validateTask(req.body);
     if (errors.length > 0) {
         return res.status(400).json({ error: "Validierung fehlgeschlagen", details: errors });
@@ -69,12 +68,11 @@ exports.createNewTask = async (req, res) => {
         const savedTask = await taskDoc.save();
         res.status(201).json(savedTask);
     } catch (error) {
-        console.error("POST ERROR:", error);
-        res.status(500).json({ error: "Datenbankfehler beim Speichern" });
+        next(error);
     }
 };
 
-exports.updateTask = async (req, res) => {
+exports.updateTask = async (req, res, next) => {
     const id = req.params.id; //funtkioniert wegen "/api/tasks/:id"
     let { title, text, taskTags } = req.body;
 
@@ -93,12 +91,11 @@ exports.updateTask = async (req, res) => {
         }
         return res.status(404).json({ error: "Task nicht gefunden!" });
     } catch (error) {
-        console.error("PUT ERROR:", error);
-        res.status(500).json({ error: "Fehler beim Verschieben" });
+        next(error);
     }
 };
 
-exports.deleteTask = async (req, res) => {
+exports.deleteTask = async (req, res, next) => {
     try {
         const deletedTask = await Task.findByIdAndDelete(req.params.id);
         if(deletedTask) {
@@ -106,12 +103,11 @@ exports.deleteTask = async (req, res) => {
         }
         return res.status(404).json({ error: "Task nicht gefunden!" });
     } catch (error) {
-        console.error("DELETE ERROR:", error);
-        res.status(500).json({ error: "Fehler beim Löschen" });
+        next(error);
     }
 };
 
-exports.moveTask = async (req, res) => {
+exports.moveTask = async (req, res, next) => {
     const id = req.params.id;
     const { newColumnId } = req.body;
 
@@ -126,7 +122,6 @@ exports.moveTask = async (req, res) => {
         }
         res.status(404).json({ error: "Task nicht gefunden" });
     } catch (error) {
-        console.error("MOVE ERROR:", error);
-        res.status(500).json({ error: "Fehler beim Verschieben" });
+        next(error);
     }
 };
