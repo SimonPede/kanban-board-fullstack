@@ -18,12 +18,28 @@
     }
 
     async function loadColumns() {
-        const response = await fetch('/api/columns');
-        columns.value = await response.json();
+        try {
+            const response = await fetch('/api/columns');
+
+            console.log("STATUS:", response.status);
+
+            const text = await response.text();
+            console.log("RAW RESPONSE:", text);
+
+            if (!response.ok) {
+                throw new Error("Server error");
+            }
+
+            columns.value = JSON.parse(text);
+
+        } catch (err) {
+            console.error("LOAD COLUMNS ERROR:", err);
+            throw err;
+        }
     }
 
     async function handleNewTask(taskData) {
-        await fetch('/api/tasks', {
+        const response = await fetch('/api/tasks', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
@@ -33,6 +49,14 @@
                 taskTags: taskData.tags
             })
         });
+
+        if (!response.ok) {
+            const errorData = await response.json();
+            console.error("SERVER FEHLER DETAILS:", errorData.details);
+            
+            alert("Fehler: " + errorData.details.join("\n")); 
+            return;
+        }
 
         await loadColumns();
         

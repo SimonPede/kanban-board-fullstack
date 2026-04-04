@@ -16,9 +16,9 @@
     const MODAL_BUTTON_SUBMIT = 'modalButtonSubmit' // for the modal's submit button
 
     const newTask = ref({
-        title: '',
-        text: '',
-        columnId: null,
+        title: "",
+        text: "",
+        columnId: "todo",
         tags: []
     });
 
@@ -28,31 +28,30 @@
         tags: Array
     });
 
-    const emit = defineEmits(['close', 'submit']);
+    const emit = defineEmits(["close", "submit"]);
 
     function resetNewTask() {
         newTask.value = {
             title: '',
             text: '',
-            columnId: props.columns[0]?.id || null,
+            columnId: props.columns[0]?.id || "todo",
             tags: []
         }
     }
 
     function handleSubmit() {
-        emit('submit', {... newTask.value});
+        emit("submit", {... newTask.value});
         resetNewTask();
     }
 
     function handleCancel() {
         resetNewTask();
-        emit('close');
+        emit("close");
     }
 
 </script>
 
 <template>
-
     <div :id="MODAL_ID" class="fixed inset-0 z-50 flex items-center justify-center p-4">
         <div class="absolute inset-0 bg-slate-900/60 backdrop-blur-sm" @click="handleCancel"></div> <!--Hintergund -->
         
