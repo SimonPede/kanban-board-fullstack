@@ -16,8 +16,8 @@
     const MODAL_BUTTON_SUBMIT = 'modalButtonSubmit' // for the modal's submit button
 
     const newTask = ref({
-        title: '',
-        text: '',
+        title: "",
+        text: "",
         columnId: "todo",
         tags: []
     });
@@ -28,7 +28,7 @@
         tags: Array
     });
 
-    const emit = defineEmits(['close', 'submit']);
+    const emit = defineEmits(["close", "submit"]);
 
     function resetNewTask() {
         newTask.value = {
@@ -40,13 +40,13 @@
     }
 
     function handleSubmit() {
-        emit('submit', {... newTask.value});
+        emit("submit", {... newTask.value});
         resetNewTask();
     }
 
     function handleCancel() {
         resetNewTask();
-        emit('close');
+        emit("close");
     }
 
 </script>
