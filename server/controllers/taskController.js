@@ -84,7 +84,7 @@ exports.updateTask = async (req, res, next) => {
                 text: text,
                 tags: taskTags
             },
-            {new: true} //gibt aktualisierte task zurück
+            { returnDocument: after } //gibt aktualisierte task zurück
         );
         if(updatedTask) {
             return res.status(200).json(updatedTask);
@@ -115,7 +115,7 @@ exports.moveTask = async (req, res, next) => {
         const updatedTask = await Task.findByIdAndUpdate(
             id,
             { columnId: newColumnId },
-            { new: true } //gibt aktualisierte task zurück
+            { returnDocument: after } //gibt aktualisierte task zurück
         );
         if (updatedTask) {
             return res.status(200).json(updatedTask);
