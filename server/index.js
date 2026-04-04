@@ -6,16 +6,14 @@ const taskRoutes = require('./routes/taskRoutes');
 require('dotenv').config();
 const mongoURI = process.env.MONGO_URI;
 
-mongoose.connect(mongoURI)
-    .then(() => console.log("Verbindung zu MongoDB Atlas steht!"))
-    .catch(err => console.error("MongoDB Verbindungsfehler:", err));
+const app = express();
 
 //Middleware
 app.use(express.json());
 app.use(express.static(path.join(__dirname, "../frontend/dist")));
 
 //DB Verbindung
-mongoose.connect(process.env.MONGO_URI)
+mongoose.connect(mongoURI)
     .then(() => console.log("Verbindung zu MongoDB Atlas steht!"))
     .catch(err => console.error("MongoDB Verbindungsfehler:", err));
 

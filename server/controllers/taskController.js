@@ -1,6 +1,6 @@
-const columnsBase = require('./data/columns.json');
-const Task = require('./models/Task.js');
-const tags = require('./data/tags.json');
+const columnsBase = require('../data/columns.json');
+const Task = require('../models/Task.js');
+const tags = require('../data/tags.json');
 
 function validateTask(task) {
     const errors = [];
@@ -84,7 +84,7 @@ exports.updateTask = async (req, res, next) => {
                 text: text,
                 tags: taskTags
             },
-            { returnDocument: after } //gibt aktualisierte task zurück
+            { returnDocument: "after" } //gibt aktualisierte task zurück
         );
         if(updatedTask) {
             return res.status(200).json(updatedTask);
@@ -115,7 +115,7 @@ exports.moveTask = async (req, res, next) => {
         const updatedTask = await Task.findByIdAndUpdate(
             id,
             { columnId: newColumnId },
-            { returnDocument: after } //gibt aktualisierte task zurück
+            { returnDocument: "after" } //gibt aktualisierte task zurück
         );
         if (updatedTask) {
             return res.status(200).json(updatedTask);
