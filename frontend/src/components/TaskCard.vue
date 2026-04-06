@@ -9,7 +9,7 @@
 	const isCollapsed = ref(true);
 
 	const otherColumns = computed(() => {
-        if (!props.allColumns) return [];
+        if (!boardStore.columns) return [];
         return boardStore.columns.filter(col => col.id !== props.currentColumnId);
     });
 
