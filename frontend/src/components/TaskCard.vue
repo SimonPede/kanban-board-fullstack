@@ -5,12 +5,12 @@
 	import { useBoardStore } from '../stores/boardStore';
     const boardStore = useBoardStore();
 
-	const props = defineProps(["task", "allColumns", "currentColumnId"]);
+	const props = defineProps(["task", "currentColumnId"]);
 	const isCollapsed = ref(true);
 
 	const otherColumns = computed(() => {
         if (!props.allColumns) return [];
-        return props.allColumns.filter(col => col.id !== props.currentColumnId);
+        return boardStore.columns.filter(col => col.id !== props.currentColumnId);
     });
 
 	function toggleCollapsed() {
@@ -19,7 +19,7 @@
 
 	function handleMove(event) {
 		const newColumnId = event.target.value;
-		boardStore.moveTaskHandler( { taskId: props.task.id, newColumnId });
+		boardStore.moveTaskHandler({ taskId: props.task.id, newColumnId });
 	}
 </script>
 
