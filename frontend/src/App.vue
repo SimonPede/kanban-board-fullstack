@@ -27,11 +27,6 @@
         </div>
 		<Modal 
 			v-if="boardStore.isOpen"
-			:isOpen="isOpen" 
-			:columns="boardStore.columns" 
-			:tags="boardStore.tags" 
-			@close="boardStore.isOpen = false"
-			@submit="boardStore.handleNewTask"
 		/>
 	</div>
 </template>

@@ -1,8 +1,7 @@
 <script setup>
-    import 'bootstrap';
     import { ref } from 'vue';
-    import Tag from './Tag.vue';
-
+    import { useBoardStore } from '../stores/boardStore';
+    
     const MODAL_ID = 'modalRoot' // for the modal's root element
     const MODAL_SELECT_COLUMN_ID = 'modalSelectColumn' // for the selector in the modal's header
     const MODAL_BUTTON_X_ID = 'modalButtonX'
@@ -15,6 +14,8 @@
     const MODAL_BUTTON_CANCEL = 'modalButtonCancel' // for the modal's cancel button
     const MODAL_BUTTON_SUBMIT = 'modalButtonSubmit' // for the modal's submit button
 
+    const boardStore = useBoardStore(); 
+
     const newTask = ref({
         title: "",
         text: "",
@@ -22,31 +23,23 @@
         tags: []
     });
 
-    const props = defineProps({
-        isOpen: Boolean,
-        columns: Array,
-        tags: Array
-    });
-
-    const emit = defineEmits(["close", "submit"]);
-
     function resetNewTask() {
         newTask.value = {
             title: '',
             text: '',
-            columnId: props.columns[0]?.id || "todo",
+            columnId: boardStore.columns[0]?.id || "todo",
             tags: []
         }
     }
 
-    function handleSubmit() {
-        emit("submit", {... newTask.value});
-        resetNewTask();
+    async function handleSubmit() {
+        await boardStore.handleNewTask(newTask.value);
+        resetForm();
     }
 
     function handleCancel() {
         resetNewTask();
-        emit("close");
+        boardStore.isOpen = false;
     }
 
 </script>
@@ -58,9 +51,9 @@
         <div class="relative w-full max-w-lg bg-white rounded-2xl shadow-2xl overflow-hidden border border-slate-200">
             <div class="px-6 py-4 border-b border-slate-100 flex items-center justify-between bg-slate-50/50">
                 <div class="flex items-center gap-3">
-                    <h5 class="text-lg font-bold text-slate-800">Create Task in</h5>
-                    <select v-model="newTask.columnId" class="bg-white border border-slate-300 text-slate-700 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 p-1.5 outline-none">
-                        <option v-for="col in columns" :key="col.id" :value="col.id">
+                    <h5 class="text-lg font-bold text-slate-800 m-0 leading-none">Create Task in</h5>
+                    <select v-model="newTask.columnId" class=" bg-slate-100 px-2 py-1 rounded-md text-blue-600 font-bold hover:bg-slate-200 transition-colors">
+                        <option v-for="col in boardStore.columns" :key="col.id" :value="col.id">
                             {{ col.name }}
                         </option>
                     </select>
@@ -69,9 +62,9 @@
                     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
                 </button>
             </div>
-            <div class="p-6 space-y-5">
-                <div>
-                    <label class="block mb-1.5 text-sm font-semibold text-slate-700">Task Title</label>
+            <div class="p-6">
+                <div class="mt-2">
+                    <label class="block mb-1.5 text-sm font-bold text-slate-700 tracking-wider">Task Title</label>
                     <input type="text" v-model="newTask.title" maxlength="50" 
                         placeholder="What needs to be done?"
                         class="w-full px-4 py-2 bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none transition-all">
@@ -80,47 +73,48 @@
                     </p>
                 </div>
 
-                <div>
-                    <label class="block mb-1.5 text-sm font-semibold text-slate-700">Description</label>
-                    <textarea v-model="newTask.text" rows="3"
+                <div class="mt-4">
+                    <label class="block mb-1.5 text-sm font-bold text-slate-700 tracking-wider">Description</label>
+                    <textarea v-model="newTask.text" rows="4"
                             class="w-full px-4 py-2 bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none transition-all"></textarea>
                 </div>
                 <div class="mt-4">
-                    <label class="block mb-2 text-sm font-semibold text-slate-700">Tags</label>
-                    <div class="grid grid-cols-2 sm:grid-cols-3 gap-3 p-3 bg-slate-50 rounded-xl border border-slate-100">
-                        <div v-for="tagName in tags" :key="tagName" class="flex">
+                    <label class="block mb-1.5 text-sm font-bold text-slate-700 tracking-wider">Tags</label>
+                    <div class="grid grid-cols-2 sm:grid-cols-3 gap-3 p-3 rounded-xl border-t border-slate-200">
+                        <div v-for="tagName in boardStore.tags" :key="tagName" class="flex">
                             <label :for="MODAL_CHECKBOX_BASE_ID + tagName"
-                                class="flex items-center w-full p-2 rounded-lg cursor-pointer select-none hover:bg-white hover:shadow-sm transition-all group"
+                                class="flex items-center w-full rounded-lg cursor-pointer select-none transition-all group"
                             >    
                                 <input
                                     type="checkbox" 
                                     :value="tagName"
                                     :id="MODAL_CHECKBOX_BASE_ID + tagName"
                                     v-model="newTask.tags"
-                                    class="shrink-0 w-4 h-4 mb-0 rounded border-slate-300 text-blue-600 focus:ring-blue-500 cursor-pointer translate-y-40px self-center"
-                                    style="margin: 0 !important; 
-                                            position: relative !important; 
-                                            top: 0px; 
-                                            display: inline-block !important;
-                                            vertical-align: middle !important;"
+                                    class="sr-only peer"
                                 >
-
-                                <div class="w-2 inline-block"></div>
-
-                                <Tag :tagText="tagName" class="ml-3" />
+                                <div class="
+                                    w-full px-3 py-2.5 rounded-xl border border-slate-200 bg-white
+                                    text-center text-sm font-bold transition-all duration-200
+                                    text-slate-600 active:scale-90
+                                    
+                                    peer-checked:!bg-blue-600 peer-checked:!text-white peer-checked:!border-blue-600 peer-checked:!shadow-md
+                                    group-hover:border-slate-300 group-hover:bg-slate-50"
+                                >
+                                    {{ tagName }}
+                                </div>
                             </label>
                         </div>
                     </div>
                 </div>
             </div>
-            <div class="px-6 py-4 bg-slate-50/80 flex justify-end gap-3">
+            <div class="mt-2 px-6 py-4 bg-slate-50/80 flex justify-end gap-3">
                 <button @click="handleCancel" 
-                        class="px-5 py-2 text-sm font-medium text-slate-600 hover:text-slate-800 transition-colors">
+                        class="px-6 py-2 text-sm font-medium text-slate-600 hover:text-slate-800 hover:bg-slate-100 transition-all rounded-xl!">
                     Cancel
                 </button>
                 
                 <button @click="handleSubmit" 
-                        class="px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-bold rounded-xl shadow-lg shadow-blue-500/30 transition-all active:scale-95">
+                        class="px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm shadow-blue-600/20! font-bold rounded-2xl! shadow-lg transition-all active:scale-95">
                     Create Task
                 </button>
             </div>
