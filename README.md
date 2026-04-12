@@ -2,18 +2,25 @@
 
 Ein interaktives Kanban-Board, entwickelt im Rahmen des Studiums **Medieninformatik** als eigenes Projekt. Dieses Projekt demonstriert das Zusammenspiel zwischen einem modernen Frontend (Vue.js) und einem persistenten Cloud-Backend (Node.js/Express + MongoDB).
 
+
+![App Screenshot](./frontend/src/assets/image.png)
+
 ## Features
+
 - **Persistente Datenhaltung:** Aufgaben werden sicher in einer MongoDB Atlas Cloud-Datenbank gespeichert.
 - **REST-API:** Vollständige CRUD-Operationen (Create, Read, Update, Delete) über ein Express-Backend.
-- **Validierung:** Server-seitige Prüfung von Eingaben zur Gewährleistung der Datenintegrität.
-- **Tag-System:** Dynamische Kategorisierung von Aufgaben mit farbigen Badges.
-- **Modernes UI:** Responsives Design mit Vue.js 3, Tailwind CSS und Bootstrap-Elementen.
+- **Decoupled Architecture:** Frontend und Backend sind getrennt gehostet für maximale Skalierbarkeit.
+- **Tag-System:** Dynamische Kategorisierung von Aufgaben mit semantischer Farblogik.
+- **Modernes UI:** Responsives Glassmorphism-Design mit Vue.js 3 und Tailwind CSS.
+- **Optimierte UX:** Visuelles Feedback durch Blur-Effekte während der Server-Synchronisation.
 
-## Technologien
-- **Frontend:** Vue.js 3 (Composition API), Vite, Tailwind CSS / Bootstrap
-- **Backend:** Node.js, Express.js, Mongoose (ODM)
-- **Datenbank:** MongoDB Atlas (NoSQL)
-- **Sicherheit:** Dotenv für Umgebungsvariablen und CORS-Management via Vite-Proxy
+## Architektur & Tech-Stack
+
+Das Projekt folgt dem Prinzip der **getrennten Verantwortlichkeiten** (Separation of Concerns):
+
+- **Frontend:** Vue.js 3 (Composition API) + Pinia (State Management) -> Gehostet auf **Vercel**.
+- **Backend:** Node.js + Express.js -> Gehostet auf **Render**.
+- **Datenbank:** MongoDB Atlas (NoSQL Cloud Hosting).
 
 ## Installation & Setup
 
@@ -31,17 +38,18 @@ Ein interaktives Kanban-Board, entwickelt im Rahmen des Studiums **Medieninforma
    MONGO_URI=mongodb+srv://<USER>:<PASSWORD>@cluster.mongodb.net/kanban
    ```
 
-3. **Frontend bauen:**
+3. **Frontend konfigurieren:**
    ```bash
       cd ../frontend
       npm install
-      npm run build
    ```
-
-4. **Anwendung starten:**
+   Erstelle eine .env Datei im frontend-Ordner:
    ```bash
-      cd ../server
-      node index.js
+      VITE_API_URL=http://localhost:3000
    ```
 
-Öffne http://localhost:3000 im Browser.
+4. **Anwendung starten (lokal):**
+   - backend: node index .js im Server-Verzeichnis
+   - frontend: npm run dev im Frontend-Verzeichnis
+
+Die Anwendung ist nun unter http://localhost:5173 (Vite Standard) erreichbar.
