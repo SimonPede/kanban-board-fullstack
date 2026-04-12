@@ -10,33 +10,34 @@
     const props = defineProps(["tagText"]);
 
     const colorClass = computed(() => {
-    switch (props.tagText) {
-        //Blau-Töne für Technik
-        case 'Backend':
-        case 'Database':
-        case 'Logic':
-            return "bg-primary-subtle text-primary border border-primary-subtle";
-        
-        //Türkis/Info für Frontend & UI
-        case 'Frontend':
-        case 'UI':
-        case 'Feature':
-            return 'bg-info-subtle text-info border border-info-subtle';
-        
-        //Lila/Violett für Design & UX
-        case 'Design':
-        case 'UX':
-        case 'Animation':
-            return 'bg-secondary text-white'; 
+        switch (props.tagText) {
+            // Blau: Harte Technik & Logik
+            case 'Backend':
+            case 'Database':
+            case 'Logic':
+                return "bg-blue-500/70 text-blue-400 border-blue-500/40";
+            
+            // Cyan/Sky: Sichtbares & Interaktion
+            case 'Frontend':
+            case 'UI':
+            case 'Feature':
+                return 'bg-cyan-500/90 text-cyan-400 border-cyan-500/20';
+            
+            // Indigo/Violett: Kreativität & Flow
+            case 'Design':
+            case 'UX':
+            case 'Animation':
+                return 'bg-indigo-500/100 text-indigo-400 border-indigo-500/20';
 
-        //Warnfarben (falls du sie mal wieder einbaust)
-        case 'Urgent':
-        case 'Bug':
-            return 'bg-danger';
+            // Rose: Warnungen & Fehler
+            case 'Urgent':
+            case 'Bug':
+                return 'bg-rose-500/100 text-rose-400 border-rose-500/20';
 
-        default:
-        return 'bg-dark text-light border border-secondary';
-    }
+            // Default: Neutrales Slate
+            default:
+                return 'bg-slate-500/90 text-slate-400 border-slate-500/20';
+        }
     });
 </script>
 
