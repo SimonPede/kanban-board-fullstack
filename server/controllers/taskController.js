@@ -74,7 +74,7 @@ exports.createNewTask = async (req, res, next) => {
 
 exports.updateTask = async (req, res, next) => {
     const id = req.params.id; //funtkioniert wegen "/api/tasks/:id"
-    let { title, text, taskTags } = req.body;
+    let { title, text, taskTags, column } = req.body;
 
     try {
         const updatedTask = await Task.findByIdAndUpdate(
@@ -82,7 +82,8 @@ exports.updateTask = async (req, res, next) => {
             {
                 title: title,
                 text: text,
-                tags: taskTags
+                tags: taskTags,
+                columnId: column
             },
             { returnDocument: "after" } //gibt aktualisierte task zurück
         );

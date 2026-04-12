@@ -14,33 +14,31 @@ export const useBoardStore = defineStore("boardStore", {
         tags: [],
         isLoading: false,
         isUpdating: false,
-        isOpen: false
+        isOpen: false,
+        curreditedTask: null
     }),
 
     actions: {
-        async loadColumns(isInitialLoad = false) {
-            if (isInitialLoad) {
-                this.isLoading = true;
-            } else {
-                this.isUpdating = true;
+        async request(url, options = {}) {
+            const response = await fetch(`${API_BASE}${url}`, options);
+            if (!response.ok) {
+                const errorData = await response.json().catch(() => ({}));
+                const error = new Error(errorData.message || "Server-Fehler");
+                error.details = errorData.details || [];
+                throw error;
             }
+            //Verhindert Fehler bei leeren Antworten
+            return response.json().catch(() => ({}));
+        },
+        async loadColumns(isInitialLoad = false) {
+
+            this[isInitialLoad ? "isLoading" : "isUpdating"] = true;
 
             try {
-                const response = await fetch(`${API_BASE}/api/columns`);
-
-                console.log("STATUS:", response.status);
-
-                const text = await response.text();
-                console.log("RAW RESPONSE:", text);
-
-                if (!response.ok) {
-                    throw new Error("Server error");
-                }
-
-                this.columns = JSON.parse(text);
-
+                this.columns = await this.request("/api/columns");
             } catch (err) {
                 console.error("LOAD COLUMNS ERROR:", err);
+                throw err;
             } finally {
                 this.isLoading = false;
                 this.isUpdating = false;
@@ -48,19 +46,20 @@ export const useBoardStore = defineStore("boardStore", {
         },
         async loadTags() {
             try {
-                const response = await fetch(`${API_BASE}/api/tags`);
-                if (!response.ok) throw new Error("Server error");
-
-                this.tags = await response.json(); // this statt .value
+                this.tags = await this.request("/api/tags");
             } catch (err) {
                 console.error("LOAD TAGS ERROR:", err);
+                throw err;
+            } finally {
+                this.isLoading = false;
+                this.isUpdating = false;
             }
         },
         async handleNewTask(taskData) {
             try {
-                const response = await fetch(`${API_BASE}/api/tasks`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
+                await this.request("/api/tasks", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
                     body: JSON.stringify({
                         column: taskData.columnId,
                         title: taskData.title,
@@ -68,43 +67,57 @@ export const useBoardStore = defineStore("boardStore", {
                         taskTags: taskData.tags
                     })
                 });
-
-                if (!response.ok) {
-                    const errorData = await response.json();
-                    console.error("SERVER FEHLER DETAILS:", errorData.details);
-                    
-                    return;
-                }
-
-                await this.loadColumns(); 
+                await this.loadColumns();
                 this.isOpen = false;
-
-            }catch(err) {
-                console.error("handleNewTask ERROR:", err);
+            } catch (err) {
+                console.error("CREATE TASK FAILED:", err);
+                throw err; //Damit das Modal weiß: "Nicht schließen, Fehler zeigen!"
             }
         },
         async handleDeleteTask(taskId) {
             try {
-                await fetch(`${API_BASE}/api/tasks/${taskId}`, {
-                    method: 'DELETE'
+                await this.request(`/api/tasks/${taskId}`, {
+                    method: "DELETE"
                 });
 
                 await this.loadColumns();
             } catch (err) {
-                console.error("DELETE ERROR:", err);
+                console.error("DELETE TASK ERROR:", err);
+                throw err;
             }
         },
-        async moveTaskHandler({taskId, newColumnId}) {
+        async handleMoveTask({taskId, newColumnId}) {
             try {
-                await fetch(`${API_BASE}/api/move-task/${taskId}`, {
-                    method: 'PUT',
-                    headers: { 'Content-Type': 'application/json' },
+                await this.request(`/api/move-task/${taskId}`, {
+                    method: "PUT",
+                    headers: { "Content-Type': 'application/json" },
                     body: JSON.stringify({ newColumnId })
                 });
 
                 await this.loadColumns();
             } catch (err) {
-                console.error("MOVETASK ERROR:", err);
+                console.error("MOVE TASK ERROR:", err);
+                throw err;
+            }
+        },
+        async handleUpdatedTask(taskId, taskData) {
+            try {
+                await this.request(`/api/tasks/${taskId}`, {
+                    method: "PUT",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({
+                        title: taskData.title,
+                        text: taskData.text,
+                        taskTags: taskData.tags,
+                        column: taskData.columnId
+                    })
+                });
+                await this.loadColumns();
+                this.isOpen = false;
+                this.currentEditedTask = null;
+            } catch (err) {
+                console.error("UPDATE TASK FAILED:", err);
+                throw err;
             }
         }
     }

@@ -19,7 +19,7 @@
 
 	function handleMove(event) {
 		const newColumnId = event.target.value;
-		boardStore.moveTaskHandler({ taskId: props.task.id, newColumnId });
+		boardStore.handleMoveTask({ taskId: props.task.id, newColumnId });
 	}
 </script>
 
