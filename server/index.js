@@ -1,6 +1,8 @@
 const express = require('express');
 const path = require('path');
 const mongoose = require('mongoose');
+const cors = require('cors');
+
 const taskRoutes = require('./routes/taskRoutes');
 
 require('dotenv').config();
@@ -12,12 +14,18 @@ const app = express();
 app.use(express.json());
 app.use(express.static(path.join(__dirname, "../frontend/dist")));
 
+//CORS aktivieren: Erlaubt Vercel-Frontend den Zugriff
+app.use(cors({
+    origin: process.env.FRONTEND_URL || '*', //später hier deine Vercel-URL eintragen!
+    methods: ['GET', 'POST', 'PUT', 'DELETE'],
+    allowedHeaders: ['Content-Type']
+}));
+
 //DB Verbindung
 mongoose.connect(mongoURI)
     .then(() => console.log("Verbindung zu MongoDB Atlas steht!"))
     .catch(err => console.error("MongoDB Verbindungsfehler:", err));
 
-//--- ROUTEN EINBINDEN ---
 //hier wird definiert: "Alle Anfragen, die mit /api anfangen, übergibst du an taskRoutes"
 app.use('/api', taskRoutes);
 
@@ -35,7 +43,7 @@ app.use((err, req, res, next) => {
     });
 });
 
-const PORT = 3000;
+const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
     console.log(`Kanban-Server läuft auf http://localhost:${PORT}`);
 });

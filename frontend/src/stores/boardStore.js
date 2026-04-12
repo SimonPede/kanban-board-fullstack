@@ -1,5 +1,5 @@
 import { defineStore } from "pinia";
-
+const API_BASE = import.meta.env.VITE_API_URL || '';
 //verwende jetzt Pinia als globalen Store für meine Komp. um
 //Pop Drilling zu vermeiden
 //jede Komponente kann direkt auf den pinia store zugreifen, ohne alles durchreichen zu müssen
@@ -26,7 +26,7 @@ export const useBoardStore = defineStore("boardStore", {
             }
 
             try {
-                const response = await fetch('/api/columns');
+                const response = await fetch(`${API_BASE}/api/columns`);
 
                 console.log("STATUS:", response.status);
 
@@ -48,7 +48,7 @@ export const useBoardStore = defineStore("boardStore", {
         },
         async loadTags() {
             try {
-                const response = await fetch('/api/tags');
+                const response = await fetch(`${API_BASE}/api/tags`);
                 if (!response.ok) throw new Error("Server error");
 
                 this.tags = await response.json(); // this statt .value
@@ -57,43 +57,55 @@ export const useBoardStore = defineStore("boardStore", {
             }
         },
         async handleNewTask(taskData) {
-            const response = await fetch('/api/tasks', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    column: taskData.columnId,
-                    title: taskData.title,
-                    text: taskData.text,
-                    taskTags: taskData.tags
-                })
-            });
+            try {
+                const response = await fetch(`${API_BASE}/api/tasks`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        column: taskData.columnId,
+                        title: taskData.title,
+                        text: taskData.text,
+                        taskTags: taskData.tags
+                    })
+                });
 
-            if (!response.ok) {
-                const errorData = await response.json();
-                console.error("SERVER FEHLER DETAILS:", errorData.details);
-                
-                alert("Fehler: " + errorData.details.join("\n")); 
-                return;
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    console.error("SERVER FEHLER DETAILS:", errorData.details);
+                    
+                    return;
+                }
+
+                await this.loadColumns(); 
+                this.isOpen = false;
+
+            }catch(err) {
+                console.error("handleNewTask ERROR:", err);
             }
-
-            await this.loadColumns(); 
-            this.isOpen = false;
         },
         async handleDeleteTask(taskId) {
-            await fetch(`/api/tasks/${taskId}`, {
-                method: 'DELETE'
-            });
+            try {
+                await fetch(`${API_BASE}/api/tasks/${taskId}`, {
+                    method: 'DELETE'
+                });
 
-            await this.loadColumns();
+                await this.loadColumns();
+            } catch (err) {
+                console.error("DELETE ERROR:", err);
+            }
         },
         async moveTaskHandler({taskId, newColumnId}) {
-            await fetch(`/api/move-task/${taskId}`, {
-                method: 'PUT',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ newColumnId })
-            });
+            try {
+                await fetch(`${API_BASE}/api/move-task/${taskId}`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ newColumnId })
+                });
 
-            await this.loadColumns();
+                await this.loadColumns();
+            } catch (err) {
+                console.error("MOVETASK ERROR:", err);
+            }
         }
     }
 })

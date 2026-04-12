@@ -86,7 +86,7 @@ exports.updateTask = async (req, res, next) => {
             },
             { returnDocument: "after" } //gibt aktualisierte task zurück
         );
-        if(updatedTask) {
+        if (updatedTask) {
             return res.status(200).json(updatedTask);
         }
         return res.status(404).json({ error: "Task nicht gefunden!" });
@@ -98,7 +98,7 @@ exports.updateTask = async (req, res, next) => {
 exports.deleteTask = async (req, res, next) => {
     try {
         const deletedTask = await Task.findByIdAndDelete(req.params.id);
-        if(deletedTask) {
+        if (deletedTask) {
             return res.status(200).send("Task gelöscht");
         }
         return res.status(404).json({ error: "Task nicht gefunden!" });
