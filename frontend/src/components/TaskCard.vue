@@ -1,7 +1,7 @@
 <script setup>
 	import { computed, ref } from 'vue';
 	import Tag from './Tag.vue'
-	import { Trash2 } from 'lucide-vue-next';
+	import { Trash2, Pencil } from 'lucide-vue-next';
 	import { useBoardStore } from '../stores/boardStore';
     const boardStore = useBoardStore();
 
@@ -20,6 +20,14 @@
 	function handleMove(event) {
 		const newColumnId = event.target.value;
 		boardStore.handleMoveTask({ taskId: props.task.id, newColumnId });
+	}
+
+	function openEditModal() {
+		boardStore.currEditedTask = { 
+			...props.task, 
+			columnId: props.currentColumnId 
+		};
+		boardStore.isOpen = true;
 	}
 </script>
 
@@ -46,22 +54,24 @@
 			<div class="d-flex flex-wrap gap-1 mb-2">
 				<Tag v-for="tag in task.tags" :key="tag" :tagText="tag" />
 			</div>
-			<div class="mt-2 pt-2 border-top border-secondary-subtle d-flex justify-content-lg-start gap-2 align-items-center">
-				<label 
-					class="form-label text-muted small m-0 mb-1 d-block" 
-					style="font-size: 0.7rem; font-weight: 600; letter-spacing: 0.05em; text-transform: uppercase;"
-				>
-					Move to status
-				</label>
+			<div class="mt-2 pt-2 border-top border-secondary-subtle d-flex justify-content-between align-items-center">
 				<select
-					class="form-select form-select-sm w-auto border-0 text-muted transition-all action-dropdown"
+					class="form-select form-select-sm w-auto border-secondary-subtle text-muted transition-all action-dropdown"
 					@change="handleMove"
 					:value="currentColumnId" 
 				>
+					<option value="" disabled selected>Move to...</option>
 					<option v-for="col in otherColumns" :value="col.id" :key="col.id">
 						→ {{ col.name }}
 					</option>
 				</select>
+				<button
+					aria-label="Editieren"
+					class="btn btn-link text-black p-0 m-0 d-flex align-items-center edit-btn"
+					@click.stop="openEditModal"
+				>
+					<Pencil :size="18"/>
+				</button>
 			</div>
 		</div>
 	</div>
@@ -82,9 +92,14 @@
     .task-card:hover {
         transform: translateY(-2px);
     }
-
-	/* Der Button ist standardmäßig fast unsichtbar*/
+	
     .delete-btn {
+        opacity: 0.4;
+        transition: opacity 0.2s ease-in-out;
+		transition: transform 0.2s;
+    }
+
+	.edit-btn {
         opacity: 0.4;
         transition: opacity 0.2s ease-in-out;
 		transition: transform 0.2s;
@@ -95,6 +110,14 @@
     }
     
     .task-card:hover .delete-btn {
+        opacity: 1.0;
+    }
+
+	.edit-btn:hover {
+        transform: translateY(-2px);
+    }
+    
+    .task-card:hover .edit-btn {
         opacity: 1.0;
     }
 

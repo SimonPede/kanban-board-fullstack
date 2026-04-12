@@ -15,7 +15,7 @@ export const useBoardStore = defineStore("boardStore", {
         isLoading: false,
         isUpdating: false,
         isOpen: false,
-        curreditedTask: null
+        currEditedTask: null
     }),
 
     actions: {
@@ -31,7 +31,6 @@ export const useBoardStore = defineStore("boardStore", {
             return response.json().catch(() => ({}));
         },
         async loadColumns(isInitialLoad = false) {
-
             this[isInitialLoad ? "isLoading" : "isUpdating"] = true;
 
             try {
@@ -90,7 +89,7 @@ export const useBoardStore = defineStore("boardStore", {
             try {
                 await this.request(`/api/move-task/${taskId}`, {
                     method: "PUT",
-                    headers: { "Content-Type': 'application/json" },
+                    headers: { "Content-Type": "application/json" },
                     body: JSON.stringify({ newColumnId })
                 });
 

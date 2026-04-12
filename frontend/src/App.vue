@@ -1,5 +1,5 @@
 <script setup>
-    import { ref, onMounted } from 'vue';
+    import { onMounted } from 'vue';
     import { useBoardStore } from './stores/boardStore'
     import Board from './components/Board.vue';
     import Header from './components/Header.vue';
@@ -17,11 +17,15 @@
 </script>
 
 <template>
-    <div v-if="boardStore.isLoading" class="d-flex justify-content-center mt-5">
-        <div class="spinner-border text-primary"></div>
+    <div v-if="boardStore.isLoading" class=" bg-[#323232] flex flex-col items-center justify-center min-h-[50vh] mt-20">
+        <div class="w-12 h-12 border-4 border-slate-200 border-t-blue-500 rounded-full animate-spin"></div>
+        <p class="mt-4 text-slate-400 font-medium animate-pulse">Loading Board...</p>
     </div>
-	<div v-else>
-        <div :class="{ 'content-blur': boardStore.isUpdating}">
+	<div v-else class="min-h-screen bg-[#323232]">
+        <div :class="[
+            'transition-all duration-500 ease-in-out',
+            { 'blur-sm grayscale opacity-50 pointer-events-none': boardStore.isUpdating }
+        ]">
             <Header/>
             <Board :columns="boardStore.columns"/>
         </div>
@@ -32,17 +36,4 @@
 </template>
 
 <style scoped>
-
-/* Board wird leicht unscharf, während es lädt */
-.content-blur {
-    filter: blur(2px) grayscale(0.3); /* Kombiniert leichte Unschärfe mit Entfärbung */
-    opacity: 0.6;
-    pointer-events: none; /* Verhindert Klicks auf das Board während des Updates */
-    transition: all 0.3s ease; /* Macht das Ein-/Ausblenden weich */
-}
-
-/* Standard-Zustand für den Content (für weichen Übergang) */
-div {
-    transition: all 0.3s ease;
-}
 </style>

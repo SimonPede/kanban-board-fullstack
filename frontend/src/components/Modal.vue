@@ -1,18 +1,6 @@
 <script setup>
-    import { ref } from 'vue';
+    import { ref, watch } from 'vue';
     import { useBoardStore } from '../stores/boardStore';
-    
-    const MODAL_ID = 'modalRoot' // for the modal's root element
-    const MODAL_SELECT_COLUMN_ID = 'modalSelectColumn' // for the selector in the modal's header
-    const MODAL_BUTTON_X_ID = 'modalButtonX'
-    const MODAL_INPUT_TITLE_ID = 'modalInputTitle' // for the input where users enter the task's title
-    const MODAL_HELPER_TITLE_ID = 'modalHelperTitle' // for the helper showing the length of entered title
-    const MODAL_INPUT_TEXT_ID = 'modalInputText' // for the textarea where users enter the task's description
-    const MODAL_DROPDOWN_TRIGGER_ID = 'modalDropdownTrigger' // for the button that toggles the tag selection dropdown
-    const MODAL_DROPDOWN_MENU_ID = 'modalDropdownMenu' // for the root element of the tag selection dropdown's menu
-    const MODAL_CHECKBOX_BASE_ID = 'modalCheckbox' // base string for the checkboxes in the dropdown, concatenate with the respective tag's name
-    const MODAL_BUTTON_CANCEL = 'modalButtonCancel' // for the modal's cancel button
-    const MODAL_BUTTON_SUBMIT = 'modalButtonSubmit' // for the modal's submit button
 
     const boardStore = useBoardStore(); 
 
@@ -22,6 +10,22 @@
         columnId: "todo",
         tags: []
     });
+
+    watch(() => boardStore.isOpen, (isOpen) => {
+        if (isOpen) {
+            if (boardStore.currEditedTask) {
+                const task = boardStore.currEditedTask;
+                newTask.value = {
+                    title: task.title,
+                    text: task.text || "",
+                    columnId: task.columnId,
+                    tags: [...(task.tags || [])]
+                };
+            } else {
+                resetForm();
+            }
+        }
+    }, { immediate: true });
 
     function resetNewTask() {
         newTask.value = {
@@ -33,8 +37,16 @@
     }
 
     async function handleSubmit() {
-        await boardStore.handleNewTask(newTask.value);
-        resetForm();
+        try {
+            if (boardStore.currEditedTask) {
+                await boardStore.handleUpdatedTask(boardStore.currEditedTask.id, newTask.value);
+            } else {
+                await boardStore.handleNewTask(newTask.value);
+            }
+            resetNewTask();
+        } catch (err) {
+            alert("Ups: " + err.message);
+        }
     }
 
     function handleCancel() {
@@ -45,13 +57,15 @@
 </script>
 
 <template>
-    <div :id="MODAL_ID" class="fixed inset-0 z-50 flex items-center justify-center">
+    <div class="fixed inset-0 z-50 flex items-center justify-center">
         <div class="absolute inset-0 bg-slate-900/60 backdrop-blur-sm" @click="handleCancel"></div> <!--Hintergund -->
         
         <div class="relative w-full max-w-lg bg-white rounded-2xl shadow-2xl overflow-hidden border border-slate-200">
             <div class="px-6 py-4 border-b border-slate-100 flex items-center justify-between bg-slate-50/50">
                 <div class="flex items-center gap-3">
-                    <h5 class="text-lg font-bold text-slate-800 m-0 leading-none">Create Task in</h5>
+                    <h5 class="text-lg font-bold text-slate-800 m-0 leading-none">
+                        {{ boardStore.currEditedTask ? "Edit Task in" : "Create Task in" }}
+                    </h5>
                     <select v-model="newTask.columnId" class=" bg-slate-100 px-2 py-1 rounded-md text-blue-600 font-bold hover:bg-slate-200 transition-colors">
                         <option v-for="col in boardStore.columns" :key="col.id" :value="col.id">
                             {{ col.name }}
@@ -82,13 +96,13 @@
                     <label class="block mb-1.5 text-sm font-bold text-slate-700 tracking-wider">Tags</label>
                     <div class="grid grid-cols-2 sm:grid-cols-3 gap-3 p-3 rounded-xl border-t border-slate-200">
                         <div v-for="tagName in boardStore.tags" :key="tagName" class="flex">
-                            <label :for="MODAL_CHECKBOX_BASE_ID + tagName"
+                            <label :for="tagName"
                                 class="flex items-center w-full rounded-lg cursor-pointer select-none transition-all group"
                             >    
                                 <input
                                     type="checkbox" 
                                     :value="tagName"
-                                    :id="MODAL_CHECKBOX_BASE_ID + tagName"
+                                    :id="tagName"
                                     v-model="newTask.tags"
                                     class="sr-only peer"
                                 >
@@ -115,7 +129,7 @@
                 
                 <button @click="handleSubmit" 
                         class="px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm shadow-blue-600/20! font-bold rounded-2xl! shadow-lg transition-all active:scale-95">
-                    Create Task
+                    {{ boardStore.currEditedTask ? "Save Changes" : "Create Task" }}
                 </button>
             </div>
         </div>
