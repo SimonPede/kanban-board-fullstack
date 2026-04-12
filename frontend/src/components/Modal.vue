@@ -22,7 +22,7 @@
                     tags: [...(task.tags || [])]
                 };
             } else {
-                resetForm();
+                resetNewTask();
             }
         }
     }, { immediate: true });
@@ -43,6 +43,7 @@
             } else {
                 await boardStore.handleNewTask(newTask.value);
             }
+            boardStore.currEditedTask = null;
             resetNewTask();
         } catch (err) {
             alert("Ups: " + err.message);
@@ -51,6 +52,7 @@
 
     function handleCancel() {
         resetNewTask();
+        boardStore.currEditedTask = null;
         boardStore.isOpen = false;
     }
 

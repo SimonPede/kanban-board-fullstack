@@ -3,6 +3,10 @@
     import { ListTodo } from 'lucide-vue-next';
     const boardStore = useBoardStore();
     
+    function openCreateModal() {
+        boardStore.currEditedTask = null;
+        boardStore.isOpen = true;
+    }
 </script>
 
 <template>
@@ -18,7 +22,7 @@
         </div>
         
         <button 
-            @click="boardStore.isOpen = true"
+            @click="openCreateModal"
             class="group flex items-center gap-2 px-5 py-2.5 bg-blue-600 text-white font-bold rounded-xl!
                 transition-all duration-300 hover:bg-blue-500 
                 hover:shadow-[0_0_20px_rgba(37,99,235,0.4)] hover:-translate-y-0.5
