@@ -32,7 +32,7 @@
 </script>
 
 <template>
-	<div class="card bg-slate-50! mt-3 shadow-sm border-0 task-card">
+	<div class="card bg-slate-100! mt-3 shadow-sm border-0 task-card">
 		<div class="card-header d-flex justify-content-between align-items-center">
 			<h6 class="m-0 fw-bold text-truncate" style="max-width: 80%;">
 				{{ task.title }}

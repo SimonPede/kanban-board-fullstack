@@ -59,79 +59,72 @@
 </script>
 
 <template>
-    <div class="fixed inset-0 z-50 flex items-center justify-center">
-        <div class="absolute inset-0 bg-slate-900/60 backdrop-blur-sm" @click="handleCancel"></div> <!--Hintergund -->
+    <div class="fixed inset-0 z-50 flex items-start sm:items-center justify-center p-4 sm:p-6">
+        <div class="absolute inset-0 bg-slate-950/40 backdrop-blur-sm" @click="handleCancel"></div> 
         
-        <div class="relative w-full max-w-lg bg-white rounded-2xl shadow-2xl overflow-hidden border border-slate-200">
-            <div class="px-6 py-4 border-b border-slate-100 flex items-center justify-between bg-slate-50/50">
-                <div class="flex items-center gap-3">
-                    <h5 class="text-lg font-bold text-slate-800 m-0 leading-none">
+        <div class="relative w-full max-w-lg bg-[#1a1f2e]/90 backdrop-blur-xl rounded-3xl shadow-[0_20px_50px_rgba(0,0,0,0.5)] overflow-hidden border border-white/10 flex flex-col max-h-[90vh]">
+            
+            <div class="px-6 py-4 border-b border-white/5 flex items-center justify-between bg-white/5 shrink-0">
+                <div class="flex items-center sm:gap-3 gap-1.5">
+                    <h5 class="text-base sm:text-lg font-bold text-white m-0 leading-none tracking-tight">
                         {{ boardStore.currEditedTask ? "Edit Task in" : "Create Task in" }}
                     </h5>
-                    <select v-model="newTask.columnId" class=" bg-slate-100 px-2 py-1 rounded-md text-blue-600 font-bold hover:bg-slate-200 transition-colors">
-                        <option v-for="col in boardStore.columns" :key="col.id" :value="col.id">
+                    <select v-model="newTask.columnId" 
+                            class="bg-slate-800/50 border border-white/10 px-2 py-1 rounded-lg text-blue-500 font-bold text-xs outline-none focus:border-blue-500/50 transition-all hover:cursor-pointer">
+                        <option v-for="col in boardStore.columns" :key="col.id" :value="col.id" class="bg-slate-500">
                             {{ col.name }}
                         </option>
                     </select>
                 </div>
-                <button @click="handleCancel" class="text-slate-400 hover:text-slate-600 transition-colors">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
+                <button @click="handleCancel" class="text-slate-400 hover:text-white transition-colors p-1 rounded-lg active:text-white">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
                 </button>
             </div>
-            <div class="p-6">
-                <div class="mt-2">
-                    <label class="block mb-1.5 text-sm font-bold text-slate-700 tracking-wider">Task Title</label>
+
+            <div class="p-6 overflow-y-auto grow custom-scrollbar space-y-6">
+                
+                <div class="space-y-2">
+                    <label class="block text-[11px] font-black text-slate-400 uppercase tracking-[0.2em]">Task Title</label>
                     <input type="text" v-model="newTask.title" maxlength="50" 
                         placeholder="What needs to be done?"
-                        class="w-full px-4 py-2 bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none transition-all">
-                    <p class="mt-1.5 text-xs text-right text-slate-400">
-                        {{ newTask.title.length }}/50 characters
+                        class="w-full px-4 py-3 bg-white/3 border border-white/10 rounded-xl text-white placeholder:text-slate-600 focus:bg-white/7 focus:border-blue-500/50 focus:ring-4 focus:ring-blue-500/10 outline-none transition-all">
+                    <p class="text-[10px] text-right text-slate-400 font-mono">
+                        {{ newTask.title.length }}/50
                     </p>
                 </div>
 
-                <div class="mt-4">
-                    <label class="block mb-1.5 text-sm font-bold text-slate-700 tracking-wider">Description</label>
+                <div class="space-y-2">
+                    <label class="block text-[11px] font-black text-slate-400 uppercase tracking-[0.2em]">Description</label>
                     <textarea v-model="newTask.text" rows="4"
-                            class="w-full px-4 py-2 bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none transition-all"></textarea>
+                            placeholder="Add more details..."
+                            class="w-full px-4 py-3 bg-white/3 border border-white/10 rounded-xl text-white placeholder:text-slate-600 focus:bg-white/[0.07] focus:border-blue-500/50 focus:ring-4 focus:ring-blue-500/10 outline-none transition-all">
+                    </textarea>
                 </div>
-                <div class="mt-4">
-                    <label class="block mb-1.5 text-sm font-bold text-slate-700 tracking-wider">Tags</label>
-                    <div class="grid grid-cols-2 sm:grid-cols-3 gap-3 p-3 rounded-xl border-t border-slate-200">
-                        <div v-for="tagName in boardStore.tags" :key="tagName" class="flex">
-                            <label :for="tagName"
-                                class="flex items-center w-full rounded-lg cursor-pointer select-none transition-all group"
-                            >    
-                                <input
-                                    type="checkbox" 
-                                    :value="tagName"
-                                    :id="tagName"
-                                    v-model="newTask.tags"
-                                    class="sr-only peer"
-                                >
-                                <div class="
-                                    w-full px-3 py-2.5 rounded-xl border border-slate-200 bg-white
-                                    text-center text-sm font-bold transition-all duration-200
-                                    text-slate-600 active:scale-90
-                                    
-                                    peer-checked:!bg-blue-600 peer-checked:!text-white peer-checked:!border-blue-600 peer-checked:!shadow-md
-                                    group-hover:border-slate-300 group-hover:bg-slate-50"
-                                >
-                                    {{ tagName }}
-                                </div>
-                            </label>
-                        </div>
+
+                <div class="space-y-2 mt-3">
+                    <label class="block text-[11px] font-black text-slate-400 uppercase tracking-[0.2em] mb-2">Tags</label>
+                    <div class="grid grid-cols-2 sm:grid-cols-3 gap-2">
+                        <label v-for="tagName in boardStore.tags" :key="tagName" class="group relative flex cursor-pointer">
+                            <input type="checkbox" :value="tagName" v-model="newTask.tags" class="sr-only peer">
+                            <div class="w-full px-3 py-2.5 sm:px-4 sm:py-3 rounded-xl border border-white/5 bg-white/3 text-center text-[11px] font-bold text-slate-400 transition-all duration-200 
+                                        group-hover:bg-white/10 group-hover:text-slate-200
+                                        peer-checked:bg-blue-600 peer-checked:text-white peer-checked:border-blue-500 peer-checked:shadow-[0_0_15px_rgba(37,99,235,0.3)]">
+                                {{ tagName }}
+                            </div>
+                        </label>
                     </div>
                 </div>
             </div>
-            <div class="mt-2 px-6 py-4 bg-slate-50/80 flex justify-end gap-3">
+
+            <div class="px-6 py-4 bg-white/5 border-t border-white/5 flex justify-end items-center gap-4 shrink-0">
                 <button @click="handleCancel" 
-                        class="px-6 py-2 text-sm font-medium text-slate-600 hover:text-slate-800 hover:bg-slate-100 transition-all rounded-xl!">
+                        class="text-sm font-bold text-slate-400 hover:text-white transition-all active:text-white">
                     Cancel
                 </button>
                 
                 <button @click="handleSubmit" 
-                        class="px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm shadow-blue-600/20! font-bold rounded-2xl! shadow-lg transition-all active:scale-95">
-                    {{ boardStore.currEditedTask ? "Save Changes" : "Create Task" }}
+                        class="px-8 py-2.5 bg-blue-600 text-white text-sm font-black rounded-xl! shadow-[0_0_20px_rgba(37,99,235,0.3)] hover:bg-blue-500 hover:-translate-y-0.5 active:scale-95 transition-all">
+                    {{ boardStore.currEditedTask ? "SAVE CHANGES" : "CREATE TASK" }}
                 </button>
             </div>
         </div>

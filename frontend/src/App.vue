@@ -1,5 +1,5 @@
 <script setup>
-    import { onMounted } from 'vue';
+    import { onMounted, watch } from 'vue';
     import { useBoardStore } from './stores/boardStore'
     import Board from './components/Board.vue';
     import Header from './components/Header.vue';
@@ -14,10 +14,18 @@
             console.log("Beim Laden von Columns oder Tags gab es einen Fehler!");
         }
     });
+
+    watch(() => boardStore.isOpen, (isOpen) => {
+        if (isOpen) {
+            document.body.style.overflow = "hidden";
+        } else {
+            document.body.style.overflow = "auto";
+        }
+    }, { immediate: true });
 </script>
 
 <template>
-    <div v-if="boardStore.isLoading" class=" bg-[#323232] flex flex-col items-center justify-center min-h-screen mt-20">
+    <div v-if="boardStore.isLoading" class="bg-[#323232] flex flex-col items-center justify-center min-h-screen mt-20">
         <div class="w-12 h-12 border-4 border-slate-200 border-t-blue-500 rounded-full animate-spin"></div>
         <p class="mt-4 text-slate-400 font-medium animate-pulse">Loading Board...</p>
     </div>

@@ -120,4 +120,4 @@ export const useBoardStore = defineStore("boardStore", {
             }
         }
     }
-})
+});
