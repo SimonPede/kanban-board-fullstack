@@ -2,24 +2,16 @@ const express = require('express');
 const router = express.Router();
 const taskController = require('../controllers/taskController');
 
-//Definition der Endpunkte (Mapping)
+router.get("/tags", taskController.getTags);
 
-//GET /api/tags
-router.get('/tags', taskController.getTags);
+router.get("/columns", taskController.getTasks);
 
-//GET /api/columns
-router.get('/columns', taskController.getTasks);
+router.post("/tasks", taskController.createNewTask);
 
-//POST /api/tasks
-router.post('/tasks', taskController.createNewTask);
+router.put("/tasks/:id", taskController.updateTask);
 
-//PUT /api/tasks/:id (Inhalt bearbeiten)
-router.put('/tasks/:id', taskController.updateTask);
+router.put("/move-task/:id", taskController.moveTask);
 
-//PUT /api/move-task/:id (Spalte wechseln)
-router.put('/move-task/:id', taskController.moveTask);
-
-//DELETE /api/tasks/:id
-router.delete('/tasks/:id', taskController.deleteTask);
+router.delete("/tasks/:id", taskController.deleteTask);
 
 module.exports = router;

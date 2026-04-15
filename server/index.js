@@ -5,8 +5,9 @@ const cors = require('cors');
 
 const taskRoutes = require('./routes/taskRoutes');
 
-require('dotenv').config();
+require("dotenv").config();
 const mongoURI = process.env.MONGO_URI;
+const frontendURL = process.env.FRONTEND_URL;
 
 const app = express();
 
@@ -16,9 +17,9 @@ app.use(express.static(path.join(__dirname, "../frontend/dist")));
 
 //CORS aktivieren: Erlaubt Vercel-Frontend den Zugriff
 app.use(cors({
-    origin: process.env.FRONTEND_URL || '*', //später hier deine Vercel-URL eintragen!
-    methods: ['GET', 'POST', 'PUT', 'DELETE'],
-    allowedHeaders: ['Content-Type']
+    origin: frontendURL || "*",
+    methods: ["GET", 'POST', "PUT", "DELETE"],
+    allowedHeaders: ["Content-Type"]
 }));
 
 //DB Verbindung
@@ -27,9 +28,9 @@ mongoose.connect(mongoURI)
     .catch(err => console.error("MongoDB Verbindungsfehler:", err));
 
 //hier wird definiert: "Alle Anfragen, die mit /api anfangen, übergibst du an taskRoutes"
-app.use('/api', taskRoutes);
+app.use("/api", taskRoutes);
 
-//jetzt globale Error-Middleware für bessere umsetzung von DRY
+//globale Error-Middleware für bessere umsetzung von DRY
 app.use((err, req, res, next) => {
     console.error("GLOBALER FEHLER-LOG:", err.stack);
 

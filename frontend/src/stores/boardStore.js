@@ -1,5 +1,5 @@
 import { defineStore } from "pinia";
-const API_BASE = import.meta.env.VITE_API_URL || '';
+const API_BASE = import.meta.env.VITE_API_URL || "";
 //verwende jetzt Pinia als globalen Store für meine Komp. um
 //Pop Drilling zu vermeiden
 //jede Komponente kann direkt auf den pinia store zugreifen, ohne alles durchreichen zu müssen
@@ -15,7 +15,7 @@ export const useBoardStore = defineStore("boardStore", {
         isLoading: false,
         isUpdating: false,
         isOpen: false,
-        currEditedTask: null
+        currEditedTask: null //für Speicheung der Werte einer Task, wenn diese von Nutzer bearbeitet wird --> übertragt Daten in Modal.vue
     }),
 
     actions: {
@@ -27,7 +27,7 @@ export const useBoardStore = defineStore("boardStore", {
                 error.details = errorData.details || [];
                 throw error;
             }
-            //Verhindert Fehler bei leeren Antworten
+            //das zusätzliche .catch verhindert Fehler bei leeren Antworten
             return response.json().catch(() => ({}));
         },
         async loadColumns(isInitialLoad = false) {
@@ -70,7 +70,7 @@ export const useBoardStore = defineStore("boardStore", {
                 this.isOpen = false;
             } catch (err) {
                 console.error("CREATE TASK FAILED:", err);
-                throw err; //Damit das Modal weiß: "Nicht schließen, Fehler zeigen!"
+                throw err; //to do: in Modal z.B. entgegenehmen und anzeigen
             }
         },
         async handleDeleteTask(taskId) {

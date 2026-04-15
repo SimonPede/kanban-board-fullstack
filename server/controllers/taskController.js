@@ -12,7 +12,7 @@ function validateTask(task) {
     }
 
     const validColumnsIds = columnsBase.map(c => c.id);
-    if (!task.column || typeof task.column !== 'string' || !validColumnsIds.includes(task.column)) {
+    if (!task.column || typeof task.column !== "string" || !validColumnsIds.includes(task.column)) {
         errors.push("Ungültige oder fehlende Spalten-ID.");
     }
 
@@ -23,24 +23,21 @@ function validateTask(task) {
     return errors;
 }
 
-///////////////////////////
-// CRUD operations
-///////////////////////////
-
-// --- ROUTEN ---
 exports.getTags = async (req, res) => {
+    //kann nur schiefgehen, wenn tags.json leer wäre. Kann momentan nicht passieren
+    //daher kein try-catch
     res.status(200).json(tags);
 };
 
 exports.getTasks = async (req, res, next) => {
     try {
-        const allTasks = await Task.find(); //alle tasks werden aus der Cloud geholt
+        const allTasks = await Task.find(); //alle tasks werden aus der Cloud geholt (durch id identifiziert)
         // console.log(allTasks);
 
         const columnsWithTasks = columnsBase.map(col => {
             return {
                 ...col,
-                tasks: allTasks.filter(e => String(e.columnId) === String(col.id))
+                tasks: allTasks.filter(task => String(task.columnId) === String(col.id))
             };
         });
         res.status(200).json(columnsWithTasks);
@@ -59,7 +56,7 @@ exports.createNewTask = async (req, res, next) => {
 
     try {
         const taskDoc = new Task({
-            title,
+            title, //kurzschreibweise nennt man "Property Shorthand"
             text,
             columnId: column,
             tags: taskTags
@@ -73,15 +70,15 @@ exports.createNewTask = async (req, res, next) => {
 };
 
 exports.updateTask = async (req, res, next) => {
-    const id = req.params.id; //funtkioniert wegen "/api/tasks/:id"
+    const id = req.params.id; //funktioniert wegen "/api/tasks/:id"
     let { title, text, taskTags, column } = req.body;
 
     try {
         const updatedTask = await Task.findByIdAndUpdate(
             id,
             {
-                title: title,
-                text: text,
+                title,
+                text,
                 tags: taskTags,
                 columnId: column
             },
