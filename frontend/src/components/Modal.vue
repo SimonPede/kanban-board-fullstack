@@ -1,8 +1,9 @@
 <script setup>
-    import { ref, watch } from 'vue';
+    import { ref, watch, nextTick } from 'vue';
     import { useBoardStore } from '../stores/boardStore';
 
     const boardStore = useBoardStore(); 
+    const errorArea = ref(null);
 
     const newTask = ref({
         title: "",
@@ -27,6 +28,20 @@
         }
     }, { immediate: true });
 
+    watch(() => boardStore.serverErrors, async (newErrors) => {
+        if (newErrors.length > 0) {
+            //warten bis Vue Element gezeichnet hat
+            await nextTick(); 
+            
+            if (errorArea.value) {
+                errorArea.value.scrollIntoView({ 
+                    behavior: "smooth",
+                    block: "start"
+                });
+            }
+        }
+    }, { deep: true });
+
     function resetNewTask() {
         newTask.value = {
             title: '',
@@ -46,11 +61,12 @@
             boardStore.currEditedTask = null;
             resetNewTask();
         } catch (err) {
-            alert("Ups: " + err.message);
+            console.log("Task Erstellung ist fehlgeschlagen. User bekommt Meldung vom Server angezeigt.");
         }
     }
 
     function handleCancel() {
+        boardStore.serverErrors = [];
         resetNewTask();
         boardStore.currEditedTask = null;
         boardStore.isOpen = false;
@@ -82,7 +98,23 @@
             </div>
 
             <div class="p-6 overflow-y-auto grow custom-scrollbar space-y-6">
-                
+                <div v-if="boardStore.serverErrors.length > 0"
+                        ref="errorArea"
+                        class="mb-6 p-3 bg-red-500/10 border border-red-500/20 rounded-xl animate-shake">
+                    <div class="flex items-start gap-3">
+                        <svg class="w-5 h-5 text-red-500 shrink-0" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                        <div class="space-y-1">
+                            <p class="text-sm font-bold text-red-500">Ah, damn! Something is wrong:</p>
+                            <ul class="text-xs text-red-400/80 list-disc list-inside">
+                                <li v-for="(err, index) in boardStore.serverErrors" :key="index">
+                                    {{ err }}
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
                 <div class="space-y-2">
                     <label class="block text-[11px] font-black text-slate-400 uppercase tracking-[0.2em]">Task Title</label>
                     <input type="text" v-model="newTask.title" maxlength="50" 
@@ -132,6 +164,16 @@
 </template>
 
 <style scoped>
+.animate-shake {
+    animation: shake 0.4s cubic-bezier(.36,.07,.19,.97) both;
+}
+
+@keyframes shake {
+    10%, 90% { transform: translate3d(-1px, 0, 0); }
+    20%, 80% { transform: translate3d(2px, 0, 0); }
+    30%, 50%, 70% { transform: translate3d(-4px, 0, 0); }
+    40%, 60% { transform: translate3d(4px, 0, 0); }
+}
 </style>
 
 
