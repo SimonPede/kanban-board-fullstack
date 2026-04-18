@@ -2,6 +2,8 @@
 
 Ein interaktives Kanban-Board, entwickelt im Rahmen des Studiums **Medieninformatik** als eigenes Projekt. Dieses Projekt demonstriert das Zusammenspiel zwischen einem modernen Frontend (Vue.js) und einem persistenten Cloud-Backend (Node.js/Express + MongoDB).
 
+## Link
+https://kanban-board-fullstack-theta.vercel.app/
 
 ![App Screenshot](./frontend/src/assets/image.png)
 
