@@ -6,18 +6,18 @@ function validateTask(task) {
     const errors = [];
 
     if (!task.title || typeof task.title !== "string" || task.title.trim().length === 0) {
-        errors.push("Titel ist erforderlich und darf nicht leer sein.");
+        errors.push("Title is necessary and cannot be empty. And i mean: for actually tracking and in the end doing a task, you need a title!");
     } else if (task.title.length > 50) {
-        errors.push("Titel darf maximal 50 Zeichen lang sein.");
+        errors.push("Title can only 50 characters long. Shorten yours please :)");
     }
 
     const validColumnsIds = columnsBase.map(c => c.id);
     if (!task.column || typeof task.column !== "string" || !validColumnsIds.includes(task.column)) {
-        errors.push("Ungültige oder fehlende Spalten-ID.");
+        errors.push("This column does not exist. How did you manage to achieve this? Fascinating indeed...");
     }
 
     if (task.taskTags && !Array.isArray(task.taskTags)) {
-        errors.push("Tags müssen als Liste (Array) gesendet werden.");
+        errors.push("tags need to be array");
     }
 
     return errors;

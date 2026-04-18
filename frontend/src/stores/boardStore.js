@@ -15,16 +15,19 @@ export const useBoardStore = defineStore("boardStore", {
         isLoading: false,
         isUpdating: false,
         isOpen: false,
-        currEditedTask: null //für Speicheung der Werte einer Task, wenn diese von Nutzer bearbeitet wird --> übertragt Daten in Modal.vue
+        currEditedTask: null, //für Speicheung der Werte einer Task, wenn diese von Nutzer bearbeitet wird --> übertragt Daten in Modal.vue
+        serverErrors: []
     }),
 
     actions: {
         async request(url, options = {}) {
+            this.serverErrors = [];
             const response = await fetch(`${API_BASE}${url}`, options);
             if (!response.ok) {
                 const errorData = await response.json().catch(() => ({}));
-                const error = new Error(errorData.message || "Server-Fehler");
+                const error = new Error(errorData.message || "Server failure");
                 error.details = errorData.details || [];
+                this.serverErrors = errorData.details || ["An unknown server error ocurred."]    ;
                 throw error;
             }
             //das zusätzliche .catch verhindert Fehler bei leeren Antworten

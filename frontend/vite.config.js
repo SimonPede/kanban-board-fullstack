@@ -3,7 +3,7 @@ import { fileURLToPath, URL } from 'node:url'
 import { defineConfig } from 'vite'
 import vue from '@vitejs/plugin-vue'
 
-// https://vitejs.dev/config/
+//https://vitejs.dev/config/
 export default defineConfig({
   plugins: [
     vue(),
@@ -15,13 +15,13 @@ export default defineConfig({
   },
   server: {
     proxy: {
-      // Alle Anfragen, die mit /api starten...
+      //alle Anfragen, die mit /api starten...
       '/api': {
-        target: 'http://localhost:3000', // ...werden an das Backend weitergereicht
+        target: 'http://localhost:3000', //...werden an das Backend weitergereicht
         changeOrigin: true,
       }
     },
-    watch: { // Direkt in server, nicht nochmal ein server-key
+    watch: { //direkt in server, nicht nochmal ein server-key
       usePolling: true,
   },
   }

@@ -1,5 +1,5 @@
 <script setup>
-	import TaskCard from './TaskCard.vue'; 
+	import TaskCard from './TaskCard copy.vue'; 
 	defineProps(["column"]);
 </script>
 
