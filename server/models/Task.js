@@ -1,18 +1,6 @@
-const mongoose = require('mongoose');
-//MongoDB ist im Gegensatz zu SQL dokumentorientiert, nicht Tabellenorientiert!
-//ein einzelner Datensatz (z.B. eine Task) ist ist ein Dokument, keine Zeile in einer Tabelle
-//ein Field ist dann eine Eigenschaft und keine Spalte
-//Ein Dokument in MongoDB sieht fast exakt so aus wie ein JSON-Objekt in JavaScript. Intern nutzt MongoDB aber BSON (Binary JSON).
-//Vorteil: Es unterstützt mehr Datentypen als Standard-JSON (z.B. echte Datums-Objekte oder Binärdaten).
-//Flexibilität: In SQL muss jede Zeile dieselben Spalten haben. In MongoDB könnte ein Task 3 Tags haben und der nächste gar keine
-//Jedes Dokument in MongoDB bekommt automatisch ein Feld namens _id (12-bit hash)
-//Habe die id für eine Task nicht übernommen: da MongoDB sich um IDs kümmert, muss ich die id nicht mehr selber zusammenbauen
+const mongoose = require("mongoose");
 
-//MongoDB selbst ist "schema-los" (man kann alles reinschmeißen)
-//daher nutze ich mongoose um ein Schema zu definieren (welche Felder ein Task haben darf)
-//Model: Aus dem Schema wird ein Model. Das ist wie eine Klasse, mit der man Befehle ausführen kann (z.B. Task.find())
-
-const TaskSchema = new mongoose.Schema({
+const taskSchema = new mongoose.Schema({
     title: { 
         type: String, 
         required: true, 
@@ -33,11 +21,14 @@ const TaskSchema = new mongoose.Schema({
     }
 });
 
-//damit ich frontend weiterhin .id nutzen kann und nicht ._id nutzen muss
-TaskSchema.set("toJSON", {
+//Normalize JSON response output for frontend compatibility
+//Exposes string "id", strips internal "__v", and deletes raw "_id"
+taskSchema.set("toJSON", {
     virtuals: true,
     versionKey: false,
-    transform: function (doc, ret) { delete ret._id }
+    transform: function (doc, ret) {
+        delete ret._id 
+    }
 });
 
-module.exports = mongoose.model("Task", TaskSchema);
+module.exports = mongoose.model("Task", taskSchema);

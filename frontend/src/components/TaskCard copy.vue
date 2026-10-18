@@ -21,8 +21,8 @@
 	}
 
 	function handleMove(event) {
-		const newColumnId = event.target.value;
-		boardStore.handleMoveTask({ taskId: props.task.id, newColumnId });
+		const columnId = event.target.value;
+		boardStore.handleMoveTask({ taskId: props.task.id, columnId });
 	}
 
 	function openEditModal() {
