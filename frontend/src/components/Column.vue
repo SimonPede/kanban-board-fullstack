@@ -1,5 +1,5 @@
 <script setup>
-	import TaskCard from './TaskCard copy.vue'; 
+	import TaskCard from "./TaskCard.vue"; 
 	defineProps(["column"]);
 </script>
 
@@ -14,8 +14,9 @@
 		
 		<div class="space-y-3">
             <TaskCard
-                v-for="task in column.tasks" :key="task.id"
-                :task="task" :currentColumnId="column.id"
+				v-for="task in column.tasks" 
+				:key="task.id"
+				:task="task"
             />
         </div>
 

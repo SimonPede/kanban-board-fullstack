@@ -13,7 +13,17 @@ export const useBoardStore = defineStore("boardStore", {
         serverErrors: []
     }),
 
+    getters: {
+        /**
+         * Returns true if the modal is currently editing an existing task
+         */
+        isEditing: (state) => !!state.currEditedTask
+    },
+
     actions: {
+        /**
+         * Centralized HTTP request helper method
+         */
         async request(url, options = {}) {
             this.serverErrors = [];
             const response = await fetch(`${API_BASE}${url}`, options);
@@ -22,13 +32,17 @@ export const useBoardStore = defineStore("boardStore", {
                 const errorData = await response.json().catch(() => ({}));
                 const error = new Error(errorData.message || "Server failure");
                 error.details = errorData.details || [];
-                this.serverErrors = errorData.details || ["An unknown server error ocurred."]    ;
+                this.serverErrors = errorData.details || ["An unknown server error occurred."]    ;
                 throw error;
             }
 
             return response.json().catch(() => ({}));
         },
 
+        /**
+         * Fetches board columns and nested tasks
+         * @param {boolean} isInitialLoad - Toggles full-screen loader if true, background blur if false
+         */
         async loadColumns(isInitialLoad = false) {
             this[isInitialLoad ? "isLoading" : "isUpdating"] = true;
 
@@ -43,18 +57,50 @@ export const useBoardStore = defineStore("boardStore", {
             }
         },
 
+        /**
+         * Fetches all available task tags
+         */
         async loadTags() {
             try {
                 this.tags = await this.request("/api/tags");
             } catch (err) {
                 console.error("LOAD TAGS ERROR:", err);
                 throw err;
-            } finally {
-                this.isLoading = false;
-                this.isUpdating = false;
             }
         },
 
+        /**
+         * Opens modal for creating a new task
+         */
+        openCreateModal() {
+            this.currEditedTask = null;
+            this.serverErrors = [];
+            this.isOpen = true;
+        },
+
+        /**
+         * Opens modal populated with task data for editing
+         * @param {Object} task - Task object to edit
+         */
+        openEditModal(task) {
+            this.currEditedTask = { ...task };
+            this.serverErrors = [];
+            this.isOpen = true;
+        },
+
+        /**
+         * Closes modal and resets edit state
+         */
+        closeModal() {
+            this.isOpen = false;
+            this.currEditedTask = null;
+            this.serverErrors = [];
+        },
+
+        /**
+         * Creates a new task and refreshes board
+         * @param {Object} taskData - Payload { columnId, title, text, tags }
+         */
         async handleNewTask(taskData) {
             try {
                 await this.request("/api/tasks", {
@@ -70,6 +116,10 @@ export const useBoardStore = defineStore("boardStore", {
             }
         },
 
+        /**
+         * Deletes a task document by ID
+         * @param {string} taskId - MongoDB ObjectId string
+         */
         async handleDeleteTask(taskId) {
             try {
                 await this.request(`/api/tasks/${taskId}`, {
@@ -82,6 +132,10 @@ export const useBoardStore = defineStore("boardStore", {
             }
         },
 
+        /**
+         * Updates task column location
+         * @param {Object} payload - Object { taskId, columnId }
+         */
         async handleMoveTask({taskId, columnId}) {
             try {
                 await this.request(`/api/move-task/${taskId}`, {
@@ -97,6 +151,11 @@ export const useBoardStore = defineStore("boardStore", {
             }
         },
 
+        /**
+         * Updates existing task details
+         * @param {string} taskId - MongoDB ObjectId string
+         * @param {Object} taskData - Updated task payload
+         */
         async handleUpdatedTask(taskId, taskData) {
             try {
                 await this.request(`/api/tasks/${taskId}`, {

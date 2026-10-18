@@ -1,19 +1,23 @@
 <script setup>
-	import { computed, ref } from 'vue';
-	import Tag from './Tag.vue'
-	import { Trash2, Pencil } from 'lucide-vue-next';
-	import { useBoardStore } from '../stores/boardStore';
+	import { computed, ref } from "vue";
+	import Tag from "./Tag.vue";
+	import { Trash2, Pencil } from "lucide-vue-next";
+	import { useBoardStore } from "../stores/boardStore.js";
+
     const boardStore = useBoardStore();
 
 	const props = defineProps({
-		task: { type: Object, required: true },
-		currentColumnId: { type: String, required: true }
+		task: {
+			type: Object,
+			required: true
+		},
 	});
+
 	const isCollapsed = ref(true);
 
 	const otherColumns = computed(() => {
         if (!boardStore.columns) return [];
-        return boardStore.columns.filter(col => col.id !== props.currentColumnId);
+        return boardStore.columns.filter(col => col.id !== props.task.columnId);
     });
 
 	function toggleCollapsed() {
@@ -21,16 +25,14 @@
 	}
 
 	function handleMove(event) {
-		const columnId = event.target.value;
-		boardStore.handleMoveTask({ taskId: props.task.id, columnId });
-	}
-
-	function openEditModal() {
-		boardStore.currEditedTask = { 
-			...props.task, 
-			columnId: props.currentColumnId 
-		};
-		boardStore.isOpen = true;
+		const targetColumnId = event.target.value;
+		if (!targetColumnId) return;
+		
+		boardStore.handleMoveTask({ 
+			taskId: props.task.id, 
+			columnId: targetColumnId 
+		});
+		event.target.value = "";
 	}
 </script>
 
@@ -68,7 +70,7 @@
 				<select
 					class="text-[11px] bg-slate-200/50 border-0 rounded-lg px-2 py-1 text-slate-500 opacity-40 group-hover:opacity-100 transition-all ease-in-out cursor-pointer focus:ring-0"
 					@change="handleMove"
-					:value="currentColumnId" 
+					:value="props.task.columnId" 
 				>
 					<option value="" disabled selected>Move to...</option>
 					<option v-for="col in otherColumns" :value="col.id" :key="col.id">
@@ -79,7 +81,7 @@
 					aria-label="Editieren"
 					
 					class="text-black/50 opacity-40 group-hover:opacity-100 transition-all duration-200 hover:-translate-y-1 hover:text-black"
-					@click.stop="openEditModal"
+					@click.stop="boardStore.openEditModal(props.task)"
 				>
 					<Pencil :size="18"/>
 				</button>
@@ -90,7 +92,6 @@
 
 <style scoped>
 
-	/*sieht finde ich besser aus als die tailwind Lösung*/
     .truncate {
         overflow: hidden;
         white-space: nowrap;
