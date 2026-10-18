@@ -72,7 +72,8 @@
 			<div class="mt-2 pt-2 flex justify-between items-center border-t border-slate-200">
 				<select
 					class="text-[11px] bg-slate-200/50 border-0 rounded-lg px-2 py-1
-						text-slate-500 opacity-40 group-hover:opacity-100 transition-all ease-in-out cursor-pointer focus:ring-0"
+						text-slate-500 sm:opacity-40! opacity-100 sm:group-hover:opacity-100
+						transition-all ease-in-out cursor-pointer focus:ring-0"
 					@change="handleMove"
 					:value="props.task.columnId" 
 				>
