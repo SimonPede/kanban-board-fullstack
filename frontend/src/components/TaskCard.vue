@@ -37,15 +37,18 @@
 </script>
 
 <template>
-	<div class="bg-slate-100 mt-3 rounded-xl border border-slate-200 shadow-sm p-4 transition-all duration-200 hover:-translate-y-1 hover:shadow-md group">
+	<div class="bg-slate-100 mt-3 rounded-xl border border-slate-200 shadow-sm
+		p-4 transition-all duration-200 hover:-translate-y-1 hover:shadow-md group"
+	>
 		<div class="flex justify-between items-center mb-3">
-			<h6 class="m-0 font-bold text-slate-800 truncate max-w-[80%]">
+			<h6 class="m-0 font-bold text-slate-800! truncate max-w-[80%]">
 				{{ task.title }}
 			</h6>
 			<button
-				class="text-red-400 opacity-40 group-hover:opacity-100 transition-all duration-200 hover:-translate-y-1 hover:text-red-600"
+				class="text-red-500 sm:text-red-400 opacity-100 sm:opacity-40! sm:group-hover:opacity-100!
+					transition-all duration-200 hover:text-red-600 sm:hover:-translate-y-1 cursor-pointer shrink-0"
 				@click.stop="boardStore.handleDeleteTask(task.id)"
-				aria-label="Löschen"
+				aria-label="Delete task"
 			>
 				<Trash2 :size="18"/>
 			</button>
@@ -54,7 +57,7 @@
 		<div 
 			:class="[
 				'text-sm text-slate-500 leading-relaxed cursor-pointer', 
-				'my-3 py-3 px-2 bg-white/40 rounded-lg border-y border-slate-200/50', 
+				'my-3 py-3 px-2 bg-white/60 rounded-lg border border-slate-200', 
 				isCollapsed ? 'truncate' : 'whitespace-normal'
 			]"
 			@click="toggleCollapsed"
@@ -64,11 +67,12 @@
 
 		<div class="space-y-3 bg-transparent border-0 pt-0">
 			<div class="flex flex-wrap gap-1 mb-2">
-				<Tag v-for="tag in task.tags" :key="tag" :tagText="tag" />
+				<Tag v-for="tag in task.tags" :key="tag" :tagText="tag"/>
 			</div>
 			<div class="mt-2 pt-2 flex justify-between items-center border-t border-slate-200">
 				<select
-					class="text-[11px] bg-slate-200/50 border-0 rounded-lg px-2 py-1 text-slate-500 opacity-40 group-hover:opacity-100 transition-all ease-in-out cursor-pointer focus:ring-0"
+					class="text-[11px] bg-slate-200/50 border-0 rounded-lg px-2 py-1
+						text-slate-500 opacity-40 group-hover:opacity-100 transition-all ease-in-out cursor-pointer focus:ring-0"
 					@change="handleMove"
 					:value="props.task.columnId" 
 				>
@@ -80,7 +84,8 @@
 				<button
 					aria-label="Editieren"
 					
-					class="text-black/50 opacity-40 group-hover:opacity-100 transition-all duration-200 hover:-translate-y-1 hover:text-black"
+					class="text-black/50 sm:opacity-40! opacity-100 sm:group-hover:opacity-100!
+						transition-all duration-200 hover:-translate-y-1 hover:text-black shrink-0"
 					@click.stop="boardStore.openEditModal(props.task)"
 				>
 					<Pencil :size="18"/>
@@ -91,7 +96,6 @@
 </template>
 
 <style scoped>
-
     .truncate {
         overflow: hidden;
         white-space: nowrap;

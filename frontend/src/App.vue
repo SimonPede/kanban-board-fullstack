@@ -1,9 +1,9 @@
 <script setup>
-    import { onMounted, watch } from 'vue';
-    import { useBoardStore } from './stores/boardStore'
-    import Board from './components/Board.vue';
-    import Header from './components/Header.vue';
-    import Modal from './components/Modal.vue';
+    import { onMounted, watch } from "vue";
+    import { useBoardStore } from "./stores/boardStore";
+    import Board from "./components/Board.vue";
+    import Header from "./components/Header.vue";
+    import Modal from "./components/Modal.vue";
 
     const boardStore = useBoardStore();
 
@@ -11,22 +11,21 @@
         try {
             await Promise.all([boardStore.loadColumns(true), boardStore.loadTags()]);
         } catch (error) {
-            console.log("Beim Laden von Columns oder Tags gab es einen Fehler!");
+            console.error("Error loading initial board data:", error);
         }
     });
 
     watch(() => boardStore.isOpen, (isOpen) => {
-        if (isOpen) {
-            document.body.style.overflow = "hidden";
-        } else {
-            document.body.style.overflow = "auto";
-        }
+        document.body.style.overflow = isOpen ? "hidden" : "auto";
     }, { immediate: true });
 </script>
 
 <template>
-    <div v-if="boardStore.isLoading" class="bg-[#323232] flex flex-col items-center justify-center min-h-screen mt-20">
-        <div class="w-12 h-12 border-4 border-slate-200 border-t-blue-500 rounded-full animate-spin"></div>
+    <div
+        v-if="boardStore.isLoading"
+        class="bg-[#0B0E14] flex flex-col items-center justify-center min-h-screen"
+    >
+        <div class="w-12 h-12 border-4 border-slate-200 border-t-blue-600 rounded-full animate-spin"></div>
         <p class="mt-4 text-slate-400 font-medium animate-pulse">Loading Board...</p>
     </div>
 	<div v-else class="min-h-screen bg-[#0B0E14]">
@@ -42,6 +41,3 @@
 		/>
 	</div>
 </template>
-
-<style scoped>
-</style>

@@ -1,6 +1,6 @@
 <script setup>
-	import Column from './Column.vue';
-    import { useBoardStore } from '../stores/boardStore';
+	import Column from "./Column.vue";
+    import { useBoardStore } from "../stores/boardStore";
     const boardStore = useBoardStore(); 
 </script>
 

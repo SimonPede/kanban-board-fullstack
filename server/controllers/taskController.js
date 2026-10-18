@@ -117,7 +117,7 @@ exports.updateTask = async (req, res, next) => {
                 columnId: req.body.columnId,
                 tags: req.body.tags || []
             },
-            { new: true, runValidators: true } //returns updated document & triggers Schema checks
+            { returnDocument: "after" } //returns updated document & triggers Schema checks
         );
 
         if (!updatedTask) {
@@ -154,7 +154,7 @@ exports.moveTask = async (req, res, next) => {
         const updatedTask = await Task.findByIdAndUpdate(
             id,
             { columnId },
-            { new: true }
+            { returnDocument: "after" }
         );
 
         if (!updatedTask) {
